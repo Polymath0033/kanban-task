@@ -12,3 +12,8 @@ export interface Data {
     }[]
   }[]
 }
+export type H = Omit<Data, 'boards'>
+export type Boards = Data['boards']
+export type Columns = Data['boards'][number]['columns']
+export type Tasks = Data['boards'][number]['columns'][number]['tasks']
+export type SubTasks = Data['boards'][number]['columns'][number]['tasks'][number]['subtasks']

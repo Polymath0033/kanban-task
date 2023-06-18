@@ -2,7 +2,7 @@
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
 //@ts-ignore
 import data from '../lib/data.json'
-import type { Data } from '@/types/Data'
+import type { Data, Boards, Tasks, SubTasks } from '@/types/Data'
 import type { InjectionKey } from 'vue'
 export interface State {
   hello: string

@@ -6,7 +6,9 @@ defineProps<{ show: boolean }>()
     <Teleport to="body">
         <div class="backdrop" v-if="show" v-on:click="$emit('toggle-handler')"></div>
         <Transition name="modal">
-            <dialog open v-if="show"> hello</dialog>
+            <dialog open v-if="show">
+                <slot></slot>
+            </dialog>
         </Transition>
     </Teleport>
 </template>
@@ -27,15 +29,12 @@ dialog {
     z-index: 1000;
     border: none;
     border-radius: 20px;
-    background-color: var(--primary-bg);
-    /* display: flex;
-    align-items: center;
-    justify-content: center; */
+    background-color: var(--secondary-background);
+    padding: 1.5rem;
     width: 80%;
     top: 20vh;
     left: 10%;
     overflow: hidden;
-
 }
 
 .modal-enter-from,

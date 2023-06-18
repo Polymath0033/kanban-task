@@ -10,17 +10,12 @@ const store = useStore();
 const data: Data[] = store.getters.data;
 type T = Data['boards']
 let routes: T = [];
-// type T = Data['boards']
 let arr: T = []
-
-// data.map(({ boards }, index) => console.log(boards))
-const filter = data.filter(({ boards }) => boards)
 for (const a of data) {
     arr = [...a.boards]
 }
-console.log(arr)
-const fil = (arr.filter((g) => g))
 
+const fil = (arr.filter((g) => g))
 routes = [...fil];
 
 </script>
