@@ -4,7 +4,7 @@ import { useStore } from '../../store_/index'
 import { useRoute } from 'vue-router';
 import Detail from '../Detail.vue';
 import { UseToggle } from '@/composable/use-toggle';
-import { ref } from 'vue';
+import { ref, onUpdated, watch } from 'vue';
 import type { Ref } from 'vue';
 defineProps<{ title: string, subtasks: SubTasks, columns: Columns }>();
 const store = useStore();
@@ -13,28 +13,25 @@ const route = useRoute()
 let routeName = route.params.children;
 const { toggle, toggleHandler } = UseToggle();
 let title_: Ref<string> = ref('');
+let k: Boards = [];
+let columns: Columns = [];
+for (const a of data) {
+    k = [...a.boards]
+}
+let filter = (k.filter(({ name }) => name === routeName)).filter(({ columns }) => columns);
+for (const a of filter) {
+    columns = a.columns
+}
+let gh: Tasks = []
+columns.forEach((h) => {
+    gh.push(...h.tasks)
+}
+)
 const clickHandler: (title: string) => void = (title) => {
-    let k: Boards = [];
-    let columns: Columns = [];
-    let b: Tasks = [];
     title_.value = title;
-    console.log(title_.value)
-    for (const a of data) {
-        k = [...a.boards]
-    }
-    // console.log(data)
-    let filter = (k.filter(({ name }) => name === routeName)).filter(({ columns }) => columns);
-    for (const a of filter) {
-        columns = a.columns
-    }
-    let gh: Tasks = []
-    columns.forEach((h) => {
-        gh.push(...h.tasks)
-    }
-    )
     let fh = gh.filter((g) => g.title === title)
-    console.log(fh)
     toggleHandler()
+    store.dispatch('toggleModal', title)
 }
 console.log(title_.value)
 </script>

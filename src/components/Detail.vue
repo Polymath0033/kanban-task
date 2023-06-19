@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Modal from './UI/Modal.vue'
 import type { Columns, SubTasks, Data, Boards, Tasks } from '@/types/Data';
-import { onUpdated, onMounted } from 'vue';
+import { onUpdated, onMounted, watch } from 'vue';
 import VerticalEllipsis from './icons/VerticalEllipsis.vue';
 import { useRoute } from 'vue-router';
 import { useStore } from '@/store_';
@@ -12,32 +12,34 @@ const props = defineProps<{ show: boolean; title: string }>()
 const route = useRoute();
 const routeName = route.params.children;
 const store = useStore()
+// const show:boolean=store.getters.modal
 const data: Data[] = store.getters.data;
-let fh: Ref<Tasks> = ref([])
+let fh: Ref<Tasks> = ref([]);
+const select: Ref<string[]> = ref([])
 onUpdated(() => {
-    console.log(props.title)
     let k: Boards = [];
     let columns: Columns = [];
     for (const a of data) {
         k = [...a.boards]
     }
-    // console.log(data)
     let filter = (k.filter(({ name }) => name === routeName)).filter(({ columns }) => columns);
     for (const a of filter) {
         columns = a.columns
     }
-    console.log(columns)
     let gh: Tasks = []
     columns.forEach((h) => {
+        select.value.push(h.name)
         gh.push(...h.tasks)
     }
     )
-    fh = gh.filter((g) => g.title === props.title)
-    console.log(fh)
+    console.log(select.value)
+    fh.value = gh.filter((g) => g.title === props.title)
 })
+watch(() => props.title, (newTitle, oldTitle) => {
 
+})
 onMounted(() => {
-    console.log(fh.value)
+    fh.value
 })
 
 </script>
@@ -64,13 +66,11 @@ onMounted(() => {
                 </form>
 
             </div>
-
             <div class="select">
-                <h4>Current status</h4>
+                <h4>Current status {{ select.length }}</h4>
                 <select name="" id="">
-                    <option>{{ detail.status }}</option>
-                    <option>{{ detail.status }}</option>
-                    <option>{{ detail.status }}</option>
+                    <option v-for="option in select" :value="option" :selected="option === detail.status">{{ option }}
+                    </option>
                 </select>
             </div>
         </div>

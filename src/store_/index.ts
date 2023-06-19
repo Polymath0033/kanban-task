@@ -8,13 +8,15 @@ export interface State {
   hello: string
   toggle: boolean
   data: Data[]
+  modal: boolean
 }
 export const key: InjectionKey<Store<State>> = Symbol()
 export const store = createStore({
   state: {
     hello: 'Hello  Vuex',
     toggle: false,
-    data: [data]
+    data: [data],
+    modal: false
   },
   getters: {
     hello(state: State) {
@@ -25,6 +27,9 @@ export const store = createStore({
     },
     data: (state: State) => {
       return state.data
+    },
+    modal: (state: State) => {
+      return state.modal
     }
   },
   mutations: {
@@ -33,6 +38,9 @@ export const store = createStore({
     },
     btnToggle(state: State) {
       state.toggle = !state.toggle
+    },
+    toggleModal(state: State, payload: string) {
+      state.modal = !state.modal
     }
   },
   actions: {
@@ -41,6 +49,9 @@ export const store = createStore({
     },
     btnToggle({ commit }: any) {
       commit('btnToggle')
+    },
+    toggleModal({ commit }: any, payload: string) {
+      commit('toggleModal', payload)
     }
   }
 })
