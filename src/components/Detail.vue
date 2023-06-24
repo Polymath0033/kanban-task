@@ -6,7 +6,8 @@ import VerticalEllipsis from './icons/VerticalEllipsis.vue';
 import { useRoute } from 'vue-router';
 import { useStore } from '@/store_';
 import type { Ref } from 'vue';
-import { ref } from 'vue';
+import { ref, inject } from 'vue';
+import { selectInjectionKeys } from '@/InjectionKey';
 defineEmits<{ (e: 'toggle-handler'): void }>()
 const props = defineProps<{ show: boolean; title: string }>()
 const route = useRoute();
@@ -15,7 +16,7 @@ const store = useStore()
 // const show:boolean=store.getters.modal
 const data: Data[] = store.getters.data;
 let fh: Ref<Tasks> = ref([]);
-const select: Ref<string[]> = ref([])
+const select = inject(selectInjectionKeys)
 onUpdated(() => {
     let k: Boards = [];
     let columns: Columns = [];
@@ -27,12 +28,12 @@ onUpdated(() => {
         columns = a.columns
     }
     let gh: Tasks = []
-    columns.forEach((h) => {
-        select.value.push(h.name)
-        gh.push(...h.tasks)
+    columns.forEach(({ name, tasks }) => {
+
+        gh.push(...tasks)
     }
     )
-    console.log(select.value)
+
     fh.value = gh.filter((g) => g.title === props.title)
 })
 watch(() => props.title, (newTitle, oldTitle) => {
@@ -59,15 +60,16 @@ onMounted(() => {
                 }})
                 </h4>
                 <form>
-                    <div class="form-control" v-for="subtasks in detail.subtasks">
-                        <input type="checkbox" :checked="subtasks.isCompleted" name="" id="">
-                        <label>{{ subtasks.title }}</label>
+                    <div class="form-control" v-for="subtask in detail.subtasks">
+                        <input type="checkbox" :checked="subtask.isCompleted" name="" id="">
+                        <label :style="{ textDecoration: subtask.isCompleted === true ? 'line-through' : '' }">{{
+                            subtask.title
+                        }}</label>
                     </div>
                 </form>
-
             </div>
             <div class="select">
-                <h4>Current status {{ select.length }}</h4>
+                <h4>Current status {{ select?.length }}</h4>
                 <select name="" id="">
                     <option v-for="option in select" :value="option" :selected="option === detail.status">{{ option }}
                     </option>
@@ -164,10 +166,12 @@ p {
 
 }
 
-.form input:checked::after {
-    /* content: 'a'; */
-    content: url('../assets/Path 2.svg');
+.form-control:hover {
+    background-color: var(--hover);
+}
 
+.form input:checked::after {
+    content: url('../assets/Path 2.svg');
 }
 
 .select {

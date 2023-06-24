@@ -1,17 +1,26 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
 import Header from './components/Header.vue';
 import IconShow from './components/icons/IconShow.vue'
 import SideBar from '@/components/SideBar.vue';
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, provide, reactive, watch } from 'vue';
+import { selectInjectionKeys } from './InjectionKey';
 import type { Ref } from 'vue';
+import { UseToggle } from './composable/use-toggle';
 //@ts-ignore
 import { useStore } from './store_/index';
+import type { Data, Boards, Columns, Tasks } from './types/Data';
 const store = useStore();
+const data: Data[] = store.getters.data;
 const toggle = computed(() => store.getters.toggle);
 const btnToggle: () => void = () => {
   store.dispatch('btnToggle');
 }
+const route = useRoute();
+const show: Ref<boolean> = ref(false);
+const toggleHandler: () => boolean = () => show.value = !show.value;
+const editBoard: Ref<boolean> = ref(false);
+const editBoardHandler: () => boolean = () => editBoard.value = !editBoard.value
 
 const theme: Ref<string> = ref('dark')
 const toggleTheme: () => void = () => {
@@ -38,16 +47,44 @@ const setTheme: (theme_: string) => void = (theme_) => {
   theme.value = theme_
   localStorage.setItem('theme', theme_);
   document.documentElement.className = theme_;
-
 }
 const getTheme = () => {
   return localStorage.getItem('theme')
 }
+let select: string[] = reactive([]);
+let k: Boards = [];
+let columns: Columns = [];
+for (const a of data) {
+  k = [...a.boards]
+}
+const filterData: (route: string | string[]) => void = (route) => {
+  let filter = (k.filter(({ name }) => name === route)).filter(({ columns }) => columns);
+  for (const a of filter) {
+    columns = a.columns
+  }
+  columns.forEach(({ name }) => {
+    // let arr = []
+    // arr.push(name)
+    // select = [...arr]
+    select.push(name)
+    console.log(select)
+
+  }
+  )
+}
+watch(() => route.params.children, (newRoute, oldRoute) => {
+  filterData(newRoute)
+})
+
+provide(selectInjectionKeys, select)
 onMounted(() => {
+  console.log(select)
   const initial_theme = getTheme() || getMediaPreference();
   if (initial_theme) {
     setTheme(initial_theme)
   }
+  const initialRoute = route.params.children;
+  filterData(initialRoute)
 })
 </script>
 
@@ -57,7 +94,8 @@ onMounted(() => {
       <SideBar :theme="theme" @toggle-theme="toggleTheme" @toggle-btn="btnToggle" />
     </div>
     <div class="right">
-      <Header :toggle="toggle" :theme="theme" />
+      <Header :toggle="toggle" :theme="theme" :show="show" :edit="editBoard" @edit-board="editBoardHandler"
+        @toggle-handler="toggleHandler" />
       <main>
         <button v-if="toggle" v-on:click="btnToggle">
           <IconShow />

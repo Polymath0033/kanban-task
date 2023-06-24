@@ -7,8 +7,8 @@
   --main-purple-hover: #a8a4ff;
   --main-purple: #635fc7;
   --light-bg: #f4f7fd;
-  --error: #ea5555;
-  --error-hover: #ff9898;
+  --err: #ea5555;
+  --err-hover: #ff9898;
   --medium-gray: #828fa3;
   --bg-dark: #2b2c37;
   --line-dark: #3e3f4e;
@@ -25,9 +25,12 @@
   --primary-purple: var(--main-purple);
   --gray: var(--medium-gray);
   --primary-bg: var(--light-bg);
-  --error: var(--error);
-  --error-hover: var(--error-hover);
+  --error: var(--err);
+  --error-hover: var(--err-hover);
   --line: var(--line-light);
+  --secondary-btn: rgba(99, 95, 199, 0.1);
+  --primary-btn: var(--main-purple);
+  --hover-btn: var(--light-bg);
 }
 
 :root.dark {
@@ -37,9 +40,12 @@
   --primary-purple: var(--main-purple);
   --gray: var(--medium-gray);
   --primary-bg: var(--vt-c-dark);
-  --error: var(--error);
-  --error-hover: var(--error-hover);
+  --error: var(--err);
+  --error-hover: var(--err-hover);
   --line: var(--line-dark);
+  --secondary-btn: #ffffff;
+  --primary-btn: '';
+  --hover-btn: var(--vt-c-white);
 }
 
 *,

@@ -22,9 +22,10 @@ let filter = (k.filter(({ name }) => name === routeName)).filter(({ columns }) =
 for (const a of filter) {
     columns = a.columns
 }
+
 let gh: Tasks = []
 columns.forEach((h) => {
-    gh.push(...h.tasks)
+    gh.push(...h.tasks);
 }
 )
 const clickHandler: (title: string) => void = (title) => {
@@ -33,14 +34,13 @@ const clickHandler: (title: string) => void = (title) => {
     toggleHandler()
     store.dispatch('toggleModal', title)
 }
-console.log(title_.value)
+
 </script>
 
 <template>
     <div v-on:click="clickHandler(title)" class="card">
         <h2>{{ title }}</h2>
         <p>{{ (subtasks.filter((k) => k.isCompleted === true)).length }} of {{ subtasks.length }} subtasks</p>
-
     </div>
     <Detail @toggle-handler="toggleHandler" :show="toggle" :title="title_" />
 </template>

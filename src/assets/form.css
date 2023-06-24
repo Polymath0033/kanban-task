@@ -1,0 +1,139 @@
+form {
+  display: grid;
+  gap: 0.5rem;
+}
+
+form h2 {
+  color: var(--primary-text);
+  font-weight: 700;
+  font-size: 18px;
+  text-transform: capitalize;
+}
+
+.form-control {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.form-control label,
+h4 {
+  color: var(--gray);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+form input,
+form textarea,
+select {
+  display: flex;
+  width: 100%;
+  border: 1px solid var(--gray);
+  outline: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  background-color: transparent;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--primary-text);
+  position: relative;
+}
+
+form textarea {
+  height: 100px;
+  overflow: hidden;
+}
+
+.form-flex {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  align-items: center;
+}
+
+.form-flex i {
+  cursor: pointer;
+}
+
+.subtasks {
+  gap: 0.5rem;
+  display: grid;
+}
+
+button {
+  border: none;
+  border-radius: 20px;
+  padding: 0.6rem 1rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.subtasks button {
+  background-color: var(--secondary-btn);
+  color: var(--main-purple);
+}
+
+.status {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.status h4 {
+  color: var(--gray);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.status select {
+  background-color: transparent;
+  border: 1px solid rgba(130, 143, 163, 0.25);
+  border-radius: 4px;
+  padding: 0.5rem;
+  font-weight: 500;
+  color: var(--primary-text);
+  background-image: url('../assets/active-caret.svg');
+  background-repeat: no-repeat;
+  background-position: right 0.25rem center;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.status option {
+  background-color: var(--secondary-background);
+  color: var(--gray);
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.status select:focus {
+  border: 1px solid var(--gray);
+  outline: none;
+}
+
+button[type='submit'] {
+  background-color: var(--main-purple);
+  color: #ffffff;
+}
+
+button[type='submit']:hover {
+  background-color: var(--hover);
+}
+
+.form-flex div {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.error input {
+  border: 1px solid var(--error);
+}
+
+.error::before {
+  content: "Can't be empty";
+  position: absolute;
+  right: 0.5rem;
+  color: var(--error);
+}

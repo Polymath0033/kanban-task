@@ -4,20 +4,40 @@ import ThemeBtn from './UI/ThemeBtn.vue';
 import IconEye from './icons/IconEye.vue';
 import { useStore } from '../store_/index'
 import type { Data } from '@/types/Data';
+import { UseToggle } from '@/composable/use-toggle';
+import AddBoard from './AddBoard.vue';
+import { watch, reactive, onMounted } from 'vue';
+const { toggle, toggleHandler } = UseToggle()
 defineProps<{ theme: string }>()
 defineEmits<{ (e: 'toggle-theme'): void, (e: 'toggle-btn'): void }>()
 const store = useStore();
-const data: Data[] = store.getters.data;
+const data: Data[] = store.state.data;
 type T = Data['boards']
-let routes: T = [];
-let arr: T = []
-for (const a of data) {
-    arr = [...a.boards]
-}
+let routes: T = reactive([]);
 
-const fil = (arr.filter((g) => g))
-routes = [...fil];
+watch(() => data, (newRoutes, oldRoutes) => {
 
+    let arr: T = []
+    for (const a of data) {
+        arr = [...a.boards]
+    }
+
+    const fil = (arr.filter((g) => g))
+    routes = [...fil];
+    if (newRoutes.length > oldRoutes.length) {
+        console.log('New items added to array')
+    }
+}, { deep: true })
+// console.log(fil);
+onMounted(() => {
+    let arr: T = []
+    for (const a of data) {
+        arr = [...a.boards]
+    }
+
+    const fil = (arr.filter((g) => g))
+    routes = [...fil];
+})
 </script>
 <template>
     <aside>
@@ -29,7 +49,8 @@ routes = [...fil];
                 <p>all board</p>
                 <router-link v-for="route_ in routes" :to="route_.name"><img src="../assets/icon-board.svg" />{{ route_.name
                 }}</router-link>
-                <button><img src="../assets/icon-board.svg" /> + Create New Board</button>
+                <button v-on:click="toggleHandler"><img src="../assets/icon-board.svg" /> + Create New Board</button>
+                <AddBoard :show="toggle" @toggle-handler="toggleHandler" />
             </nav>
         </span>
         <div class="btn">
@@ -38,7 +59,6 @@ routes = [...fil];
                 <IconEye />
                 Hide Sidebar
             </button>
-
         </div>
     </aside>
 </template>
@@ -89,7 +109,8 @@ nav {
 }
 
 nav a,
-.list button {
+.list button,
+.btn button:hover {
     all: unset;
     padding: 0.5rem 1rem;
     display: flex;
@@ -114,6 +135,16 @@ nav a.router-link-exact-active {
 
 nav a.router-link-exact-active:hover {
     background-color: var(--hover);
+}
+
+nav a:hover,
+.btn button:hover {
+    background-color: var(--hover-btn);
+    color: var(--primary-purple);
+}
+
+.btn button:hover {
+    margin-top: 1rem;
 }
 
 nav img {

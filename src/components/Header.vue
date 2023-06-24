@@ -1,18 +1,13 @@
 <script setup lang="ts">
-import { UseToggle } from '@/composable/use-toggle';
 import { useRoute } from 'vue-router';
 import { getImageLink } from '@/lib/getImageLink';
-import Modal from './UI/Modal.vue';
-// import { useStore } from 'vuex';
-defineProps<{ toggle: boolean, theme: string }>()
-const { toggle: toggle_, toggleHandler } = UseToggle()
+import AddNewTask from './AddNewTask.vue';
+import Toast from './Toast.vue';
+defineProps<{ toggle: boolean, theme: string, show: boolean, edit: boolean }>();
+defineEmits<{ (e: 'toggle-handler'): boolean, (e: 'edit-board'): void }>()
 const route = useRoute();
-// const store = useStore();
-// const hello = store.state.hello
-//console.log(store.dispatch('changeText','hi'))
-// const click = (payload: string) => {
-//     store.dispatch('changeText', payload)
-// }
+
+
 </script>
 <template>
     <header :theme="theme" :toggle="toggle" :class="toggle ? 'toggle' : 'toggle_'">
@@ -24,16 +19,15 @@ const route = useRoute();
         </span>
         <h1 v-if="!toggle">{{ route.params.children }}</h1>
         <div class="button">
-            <button>+Add New Task</button>
-            <img v-on:click="toggleHandler" src="../assets/icon-vertical-ellipsis.svg" />
+            <button v-on:click="$emit('toggle-handler')">+Add New Task</button>
+            <img src="../assets/icon-vertical-ellipsis.svg" v-on:click="$emit('edit-board')" />
+            <Toast content="Board" :show="edit" @toggle-handler="$emit('edit-board')" />
         </div>
+        <add-new-task :show="show" @toggle-handler="$emit('toggle-handler')"></add-new-task>
     </header>
-
-    <Modal @toggle-handler="toggleHandler" :show="toggle_" />
 </template>
 <style scoped>
 header {
-
     background-color: var(--secondary-background);
     display: flex;
     justify-content: space-between;

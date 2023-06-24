@@ -22,6 +22,7 @@ const filterData: (route: string | string[]) => void = (route) => {
   }
 }
 watch(
+
   () => router.params.children, (newRoute: string | string[], oldRoute) => {
     filterData(newRoute)
   }

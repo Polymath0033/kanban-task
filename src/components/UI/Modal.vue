@@ -1,12 +1,13 @@
 <script setup lang="ts">
 defineEmits<{ (e: 'toggle-handler'): void }>()
-defineProps<{ show: boolean }>()
+defineProps<{ show: boolean; top?: number }>();
+
 </script>
 <template>
     <Teleport to="body">
         <div class="backdrop" v-if="show" v-on:click="$emit('toggle-handler')"></div>
         <Transition name="modal">
-            <dialog open v-if="show">
+            <dialog open v-if="show" :style="{ top: top + 'rem' }">
                 <slot></slot>
             </dialog>
         </Transition>
@@ -24,6 +25,7 @@ defineProps<{ show: boolean }>()
     z-index: 100;
 }
 
+
 dialog {
     position: fixed;
     z-index: 1000;
@@ -34,8 +36,9 @@ dialog {
     width: 80%;
     top: 20vh;
     left: 10%;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
+
 
 .modal-enter-from,
 .modal-leave-to {
