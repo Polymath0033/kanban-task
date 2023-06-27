@@ -2,66 +2,69 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;800&display=swap');
 :root {
-  --vt-c-white: #ffffff;
-  --vt-c-dark: #000012;
-  --main-purple-hover: #a8a4ff;
-  --main-purple: #635fc7;
-  --light-bg: #f4f7fd;
-  --err: #ea5555;
-  --err-hover: #ff9898;
-  --medium-gray: #828fa3;
-  --bg-dark: #2b2c37;
-  --line-dark: #3e3f4e;
-  --line-light: #e4ebfa;
-  --c: #20212c;
+    --vt-c-white: #ffffff;
+    --vt-c-dark: #000012;
+    --main-purple-hover: #a8a4ff;
+    --main-purple: #635fc7;
+    --light-bg: #f4f7fd;
+    --err: #ea5555;
+    --err-hover: #ff9898;
+    --medium-gray: #828fa3;
+    --bg-dark: #2b2c37;
+    --line-dark: #3e3f4e;
+    --line-light: #e4ebfa;
+    --c: #20212c;
 }
+
 
 /* semantic color variables for this project */
 
 :root {
-  --secondary-background: var(--vt-c-white);
-  --primary-text: var(--vt-c-dark);
-  --hover: var(--main-purple-hover);
-  --primary-purple: var(--main-purple);
-  --gray: var(--medium-gray);
-  --primary-bg: var(--light-bg);
-  --error: var(--err);
-  --error-hover: var(--err-hover);
-  --line: var(--line-light);
-  --secondary-btn: rgba(99, 95, 199, 0.1);
-  --primary-btn: var(--main-purple);
-  --hover-btn: var(--light-bg);
+    --secondary-background: var(--vt-c-white);
+    --primary-text: var(--vt-c-dark);
+    --hover: var(--main-purple-hover);
+    --primary-purple: var(--main-purple);
+    --gray: var(--medium-gray);
+    --primary-bg: var(--light-bg);
+    --error: var(--err);
+    --error-hover: var(--err-hover);
+    --line: var(--line-light);
+    --secondary-btn: rgba(99, 95, 199, 0.1);
+    --primary-btn: var(--main-purple);
+    --hover-btn: var(--light-bg);
+    --secondary-hover: rgba(99, 95, 199, 0.25);
 }
 
 :root.dark {
-  --secondary-background: var(--bg-dark);
-  --primary-text: var(--vt-c-white);
-  --hover: var(--main-purple-hover);
-  --primary-purple: var(--main-purple);
-  --gray: var(--medium-gray);
-  --primary-bg: var(--vt-c-dark);
-  --error: var(--err);
-  --error-hover: var(--err-hover);
-  --line: var(--line-dark);
-  --secondary-btn: #ffffff;
-  --primary-btn: '';
-  --hover-btn: var(--vt-c-white);
+    --secondary-background: var(--bg-dark);
+    --primary-text: var(--vt-c-white);
+    --hover: var(--main-purple-hover);
+    --primary-purple: var(--main-purple);
+    --gray: var(--medium-gray);
+    --primary-bg: var(--vt-c-dark);
+    --error: var(--err);
+    --error-hover: var(--err-hover);
+    --line: var(--line-dark);
+    --secondary-btn: #ffffff;
+    --primary-btn: '';
+    --hover-btn: var(--vt-c-white);
+    --secondary-hover: var(--vt-c-white);
 }
 
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Plus Jakarta Sans';
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Plus Jakarta Sans';
 }
 
 body {
-  min-height: 100vh;
-  background-color: var(--primary-bg);
+    min-height: 100vh;
+    background-color: var(--primary-bg);
 }
 
 body::-webkit-scrollbar {
-  display: none;
+    display: none;
 }

@@ -131,9 +131,20 @@ button[type='submit']:hover {
   border: 1px solid var(--error);
 }
 
-.error::before {
+.error::before,
+.title-error::before {
   content: "Can't be empty";
   position: absolute;
   right: 0.5rem;
   color: var(--error);
+}
+
+.title-error::before {
+  right: 2.3rem;
+  top: 16%;
+}
+
+i:hover svg {
+  color: red;
+  fill: red;
 }

@@ -29,3 +29,9 @@ export type Board = {
     }[]
   }[]
 }
+export type Task = {
+  title: string
+  description: string
+  status: string
+  subtasks: { title: string; isCompleted: boolean }[]
+}

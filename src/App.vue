@@ -63,12 +63,7 @@ const filterData: (route: string | string[]) => void = (route) => {
     columns = a.columns
   }
   columns.forEach(({ name }) => {
-    // let arr = []
-    // arr.push(name)
-    // select = [...arr]
     select.push(name)
-    console.log(select)
-
   }
   )
 }
@@ -78,7 +73,7 @@ watch(() => route.params.children, (newRoute, oldRoute) => {
 
 provide(selectInjectionKeys, select)
 onMounted(() => {
-  console.log(select)
+
   const initial_theme = getTheme() || getMediaPreference();
   if (initial_theme) {
     setTheme(initial_theme)

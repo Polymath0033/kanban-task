@@ -4,9 +4,9 @@ import { useStore } from '../../store_/index'
 import { useRoute } from 'vue-router';
 import Detail from '../Detail.vue';
 import { UseToggle } from '@/composable/use-toggle';
-import { ref, onUpdated, watch } from 'vue';
+import { ref } from 'vue';
 import type { Ref } from 'vue';
-defineProps<{ title: string, subtasks: SubTasks, columns: Columns }>();
+const props = defineProps<{ title: string, subtasks: SubTasks, columns: Columns }>();
 const store = useStore();
 const data: Data[] = store.getters.data;
 const route = useRoute()

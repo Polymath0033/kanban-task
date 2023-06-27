@@ -2,56 +2,41 @@
 import { UseToggle } from '@/composable/use-toggle';
 import { useStore } from '../store_/index'
 import EditBoard from './EditBoard.vue'
+import DeleteBoard from './DeleteBoard.vue'
+import { useRoute } from 'vue-router';
+import { ref, type Ref } from 'vue';
 const props = defineProps<{ content: string, show: boolean }>()
 const emit = defineEmits<{ (e: 'toggle-handler'): void }>()
 console.log(props.show)
-
 const store = useStore();
-// const show = store.getters.edit;
+const route = useRoute();
+const routeName = route.params.children;
+const show_: Ref<boolean> = ref(false);
+const toggleDelete: () => boolean = () => show_.value = !show_.value;
 const { toggle, toggleHandler } = UseToggle()
 const openEdit: () => void = () => {
     emit('toggle-handler')
     toggleHandler()
-    console.log(props.show)
-
 }
+const openDelete: () => void = () => {
+    emit('toggle-handler');
+    toggleDelete()
+}
+const deleteHandler: () => void = () => {
+    const payload = route.params.children;
+    store.dispatch('deleteBoard', payload);
+    toggleDelete();
+}
+console.log(routeName);
 </script>
 <template>
     <ul v-if="props.show">
         <li v-on:click="openEdit">Edit {{ props.content }}</li>
-        <li>Delete {{ props.content }}</li>
+        <li v-on:click="openDelete">Delete {{ props.content }}</li>
     </ul>
     <EditBoard :show="toggle" @toggle-handler="toggleHandler" />
+    <DeleteBoard :show="show_" :payload="routeName" @delete-board="deleteHandler" @cancel-delete="toggleDelete" />
 </template>
 <style>
-ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    position: absolute;
-    bottom: 0;
-    z-index: 10000;
-    border-radius: 12px;
-    box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
-    background-color: var(--secondary-background);
-    gap: 0.5rem;
-    padding: 0.8rem 1rem;
-    width: 200px;
-    right: 1rem;
-    bottom: -100%;
-
-}
-
-ul li {
-    font-weight: 700;
-    font-size: 13px;
-    color: var(--gray);
-    padding: 0.4rem 0;
-    cursor: pointer;
-}
-
-ul li:last-of-type {
-    color: var(--error);
-}
+@import url('../assets/toast.css');
 </style>

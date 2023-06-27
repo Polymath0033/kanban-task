@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import Card from './UI/Card.vue';
 import type { Columns } from '@/types/Data';
-
-defineProps<{ columns: Columns }>();
-
-
+const props = defineProps<{ columns: Columns }>();
 </script>
 <template>
-    <menu v-for="col in columns" :key="col.name">
-        <h6 class="title"> <span></span>{{ col.name }} ({{ col.tasks.length }})</h6>
+    <menu v-for="col in props.columns" :key="col.name">
+        <h6 class="title" v-if="col.tasks.length > 0"> <span></span>{{ col.name }} ({{ col.tasks.length }})</h6>
         <Card v-for="task in col.tasks" :key="task.title" :title="task.title" :subtasks="task.subtasks"
             :columns="columns" />
     </menu>
+    <aside>
+        <h2>+ New Column</h2>
+    </aside>
 </template>
 <style scoped>
 menu {
@@ -32,5 +32,33 @@ menu {
     background-color: red;
     border-radius: 50%;
     margin-right: 0.5rem;
+}
+
+menu:nth-of-type(1) .title span {
+    background-color: #49C4E5;
+}
+
+menu:nth-of-type(2) .title span {
+    background-color: #8471F2;
+}
+
+menu:nth-of-type(3) .title span {
+    background-color: #67E2AE;
+}
+
+aside {
+    height: calc(100vh - 120px);
+    border-radius: 6px;
+    background: #E9EFFA;
+    color: #828FA3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 200px
+}
+
+aside h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
 }
 </style>
