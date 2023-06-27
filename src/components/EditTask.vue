@@ -12,7 +12,9 @@ const store = useStore();
 const tasks: Ref<Tasks> = ref([])
 const data: Data[] = store.getters.data;
 const boards = data[0].boards;
-const route = useRoute()
+const route = useRoute();
+console.log(route.params.children);
+console.log(props.title)
 const filter = boards.filter(({ name }) => name === route.params.children);
 const boardIndex = boards.findIndex(({ name }) => name === route.params.children);
 const selected: { val: string, isValid: boolean } = reactive({ val: '', isValid: false })
@@ -129,9 +131,11 @@ const editTask = () => {
             </div>
             <div class="subtasks">
                 <h4>Subtasks</h4>
-                <div v-for="(subtask, index) in subtasks" :key="index" :class="subtask.isValid === true ? 'error' : ''"
-                    class="form-flex">
-                    <input type="text" v-model="subtask.val" /><i v-on:click="removeSubtasks(index)">
+                <div v-for="(subtask, index) in subtasks" :key="index" class="form-flex">
+                    <div :class="subtask.isValid === true ? 'error' : ''">
+                        <input type="text" v-model="subtask.val" />
+                    </div>
+                    <i v-on:click="removeSubtasks(index)">
                         <Cancel />
                     </i>
                 </div>
@@ -139,7 +143,7 @@ const editTask = () => {
             </div>
             <div class="status">
                 <h4>Status</h4>
-                <select v-model="task.status">
+                <select>
                     <option v-for="value in select" :key="value" :selected='value === task.status'>{{ value }}</option>
                 </select>
             </div>

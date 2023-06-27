@@ -11,7 +11,7 @@ import EditToast from './UI/EditToast.vue';
 import { UseToggle } from '@/composable/use-toggle';
 const emit = defineEmits<{ (e: 'toggle-handler'): void }>()
 const { toggle, toggleHandler } = UseToggle()
-const props = defineProps<{ show: boolean; title: string }>()
+const props = defineProps<{ show: boolean; title: string, col: string }>()
 const route = useRoute();
 const routeName = route.params.children;
 const store = useStore();
@@ -21,15 +21,16 @@ const toggleToast = () => {
     // toggleHandler();
     emit('toggle-handler')
 }
-const toggleCompleted: (param: Task, title_: string) => void = (param, title_) => {
-    const boardIndex = data[0].boards.findIndex(({ name }) => name === route.params.children);
-    const filterBoard = data[0].boards.filter(({ name }) => name === route.params.children);
-    let columns: Columns = [];
-    for (const col of filterBoard) {
-        columns = col.columns
-    }
-    const filterColumns = columns.filter(({ name }) => name === param.status)
-    const columnIndex = columns.findIndex(({ name }) => name === param.status)
+const select_: Ref<string> = ref('')
+const boardIndex = data[0].boards.findIndex(({ name }) => name === route.params.children);
+const filterBoard = data[0].boards.filter(({ name }) => name === route.params.children);
+let columns: Columns = [];
+for (const col of filterBoard) {
+    columns = col.columns
+}
+const toggleCompleted: (param: Task, title_: string, col: string) => void = (param, title_, col) => {
+    const filterColumns = columns.filter(({ name }) => name === col)
+    const columnIndex = columns.findIndex(({ name }) => name === col)
     let tasks: Tasks = []
     for (const task of filterColumns) {
         tasks = task.tasks
@@ -44,7 +45,21 @@ const toggleCompleted: (param: Task, title_: string) => void = (param, title_) =
     const payload = { boardIndex: boardIndex, columnIndex: columnIndex, taskIndex: taskIndex, subtaskIndex: subTaskIndex }
     store.dispatch('toggleCompleted', payload)
 }
-let status: string[] = []
+const selectHandler: (param: Task, col: string) => void = (param, col) => {
+    const filterColumns = columns.filter(({ name }) => name === col)
+    let tasks: Tasks = []
+    for (const task of filterColumns) {
+        tasks = task.tasks
+    }
+    console.log(select_.value)
+    const taskIndex = tasks.findIndex(({ title }) => title === param.title);
+    const payload = { boardIndex: boardIndex, taskIndex: taskIndex, status: select_.value }
+    store.dispatch('updateStatus', payload)
+}
+let status: string[] = [];
+let title_ = '';
+let status_ = ''
+
 const filterHandler: (router: string | string[]) => void = (router) => {
     let k: Boards = [];
     let columns: Columns = [];
@@ -76,6 +91,10 @@ onUpdated(() => {
     }
     )
     fh.value = gh.filter((g) => g.title === props.title)
+    fh.value.forEach(({ title, status }) => {
+        title_ = title
+        status_ = status
+    })
 })
 watch(() => props.title, (newTitle, oldTitle) => {
 
@@ -94,12 +113,11 @@ onMounted(() => {
     <modal :show="props.show" @toggle-handler="$emit('toggle-handler')">
         <div v-for="detail in fh" class="grid">
             <div class="top" role="alert">
-                <h2> {{ detail.title }} </h2>
+                <h2> {{ detail.title }} {{ status_ }} </h2>
                 <i role="button" v-on:click="toggleHandler">
                     <VerticalEllipsis />
                 </i>
-                <edit-toast :show="toggle" :title="detail.title" :name="detail.status"
-                    @toggle-handler="toggleHandler"></edit-toast>
+                <edit-toast :show="toggle" :title="title_" :name="props.col" @toggle-handler="toggleHandler"></edit-toast>
             </div>
             <p>{{ detail.description }}</p>
             <div class=" form">
@@ -109,7 +127,7 @@ onMounted(() => {
                 </h4>
                 <form>
                     <div class="form-control" v-for="subtask in detail.subtasks">
-                        <input type="checkbox" v-on:change="toggleCompleted(detail, subtask.title)"
+                        <input type="checkbox" v-on:change="toggleCompleted(detail, subtask.title, props.col)"
                             :checked="subtask.isCompleted" name="" id="">
                         <label
                             :style="{ textDecoration: subtask.isCompleted === true ? 'line-through' : '', opacity: !subtask.isCompleted ? 1 : 0.5 }">{{
@@ -119,8 +137,8 @@ onMounted(() => {
                 </form>
             </div>
             <div class="select">
-                <h4>Current status {{ status.length }}</h4>
-                <select name="" id="">
+                <h4>Current status {{ status.length }} {{ select_ }}</h4>
+                <select name="" v-model="select_" v-on:change="selectHandler(detail, props.col)" id="">
                     <option v-for="option in status" :value="option" :selected="option === detail.status">{{ option }}
                     </option>
                 </select>

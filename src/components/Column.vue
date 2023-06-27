@@ -6,8 +6,8 @@ const props = defineProps<{ columns: Columns }>();
 <template>
     <menu v-for="col in props.columns" :key="col.name">
         <h6 class="title" v-if="col.tasks.length > 0"> <span></span>{{ col.name }} ({{ col.tasks.length }})</h6>
-        <Card v-for="task in col.tasks" :key="task.title" :title="task.title" :subtasks="task.subtasks"
-            :columns="columns" />
+        <Card v-for="task in col.tasks" :key="task.title" :title="task.title" :subtasks="task.subtasks" :columns="columns"
+            :col="col.name" />
     </menu>
     <aside>
         <h2>+ New Column</h2>

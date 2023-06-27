@@ -6,7 +6,7 @@ import Detail from '../Detail.vue';
 import { UseToggle } from '@/composable/use-toggle';
 import { ref } from 'vue';
 import type { Ref } from 'vue';
-const props = defineProps<{ title: string, subtasks: SubTasks, columns: Columns }>();
+const props = defineProps<{ title: string, subtasks: SubTasks, columns: Columns, col: string }>();
 const store = useStore();
 const data: Data[] = store.getters.data;
 const route = useRoute()
@@ -42,7 +42,7 @@ const clickHandler: (title: string) => void = (title) => {
         <h2>{{ title }}</h2>
         <p>{{ (subtasks.filter((k) => k.isCompleted === true)).length }} of {{ subtasks.length }} subtasks</p>
     </div>
-    <Detail @toggle-handler="toggleHandler" :show="toggle" :title="title_" />
+    <Detail @toggle-handler="toggleHandler" :show="toggle" :title="title_" :col="props.col" />
 </template>
 <style scoped>
 .card {

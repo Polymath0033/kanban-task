@@ -41,6 +41,13 @@ export interface ToggleCompleted {
   taskIndex: number
   subtaskIndex: number
 }
+export interface UpdateStatus {
+  boardIndex: number
+  columnIndex: number
+  taskIndex: number
+  title: string
+  status: string
+}
 export const key: InjectionKey<Store<State>> = Symbol()
 export const store = createStore({
   state: {
@@ -185,6 +192,46 @@ export const store = createStore({
           }
         }
       }
+    },
+    updateStatus: (state: State, payload: UpdateStatus) => {
+      console.log(payload)
+      const data = state.data[0]
+      const findMatchColumn: (column: Columns, status: string) => string = (column, status) => {
+        const matchColumn = column.find(
+          (column_) => column_.name.toLowerCase() === status.toLowerCase()
+        )
+        return matchColumn ? matchColumn.name : ''
+      }
+
+      if (data) {
+        const boards = data.boards[payload.boardIndex]
+        if (boards && boards.columns) {
+          const task = boards.columns.flatMap((column) => column.tasks)[payload.taskIndex]
+          if (task) {
+            if (payload.status !== undefined) {
+              const newStatus = payload.status
+                ? findMatchColumn(boards.columns, payload.status)
+                : ''
+              if (task.status !== newStatus) {
+                const currentColumn = boards.columns.find(({ tasks }) => tasks.includes(task))
+                console.log(boards.columns.find(({ name }) => name === newStatus))
+
+                if (currentColumn) {
+                  const newColumn = boards.columns.find(({ name }) => name === newStatus)
+                  console.log(newColumn)
+                  console.log(task)
+                  if (newColumn) {
+                    currentColumn.tasks.splice(payload.taskIndex, 1)
+                    newColumn.tasks.push(task)
+                    task.status = newStatus
+                  }
+                  console.log(newColumn)
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   actions: {
@@ -220,6 +267,9 @@ export const store = createStore({
     },
     toggleCompleted: ({ commit }: any, payload: string) => {
       commit('toggleCompleted', payload)
+    },
+    updateStatus: ({ commit }: any, payload: UpdateStatus) => {
+      commit('updateStatus', payload)
     }
   }
 })

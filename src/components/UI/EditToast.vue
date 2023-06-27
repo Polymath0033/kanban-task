@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue';
-
 import EditTask from '../EditTask.vue'
 const props = defineProps<{ show: boolean, title: string, name: string }>()
 const emit = defineEmits<{ (e: 'toggle-handler'): void }>()
-
 const edit: Ref<boolean> = ref(false)
 const delete_: Ref<boolean> = ref(false);
 const editHandler: () => boolean = () => edit.value = !edit.value;
@@ -12,9 +10,6 @@ const deleteHandler: () => boolean = () => delete_.value = !delete_.value;
 const openEdit: () => void = () => {
     editHandler();
     emit('toggle-handler')
-    console.log(props.show)
-    console.log(edit.value)
-
 }
 const openDelete: () => void = () => {
     emit('toggle-handler');
