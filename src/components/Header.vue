@@ -3,27 +3,39 @@ import { useRoute } from 'vue-router';
 import { getImageLink } from '@/lib/getImageLink';
 import AddNewTask from './AddNewTask.vue';
 import Toast from './Toast.vue';
+import { ref, type Ref } from 'vue';
+import Dropdown from './Dropdown.vue';
 defineProps<{ toggle: boolean, theme: string, show: boolean, edit: boolean }>();
-defineEmits<{ (e: 'toggle-handler'): boolean, (e: 'edit-board'): void }>()
+defineEmits<{ (e: 'toggle-handler'): boolean, (e: 'edit-board'): void, (e: 'toggle-theme'): void }>();
+const dropdown: Ref<boolean> = ref(false);
+const dropdownHandler: () => boolean = () => dropdown.value = !dropdown.value;
 const route = useRoute();
-
-
 </script>
 <template>
     <header :theme="theme" :toggle="toggle" :class="toggle ? 'toggle' : 'toggle_'">
-        <span v-if="toggle" style="display: flex;align-items: center;">
+        <span v-if="toggle" :class="toggle ? 'span' : ''" style="display: flex;align-items: center;">
             <div class="logo">
                 <img :src="`${theme === 'light' ? getImageLink('logo-dark') : getImageLink('logo-light')}`" />
             </div>
-            <h1>{{ route.params.children }}</h1>
+            <h1>{{ route.params.children }} </h1>
         </span>
-        <h1 v-if="!toggle">{{ route.params.children }}</h1>
+        <span class="mobile">
+            <div>
+                <img :src="getImageLink('logo-mobile')" />
+            </div>
+            <h1>{{ route.params.children }} <img v-on:click="dropdownHandler" class="caret"
+                    :src="`${dropdown ? getImageLink('icon-chevron-up') : getImageLink('icon-chevron-down')}`" />
+                <Dropdown @dropdown-handler="dropdownHandler" @toggle-theme="$emit('toggle-theme')" :dropdown="dropdown" />
+            </h1>
+        </span>
+        <h1 v-if="!toggle" class="h1">{{ route.params.children }}</h1>
         <div class="button">
             <button v-on:click="$emit('toggle-handler')">+Add New Task</button>
+            <button v-on:click="$emit('toggle-handler')">+</button>
             <img src="../assets/icon-vertical-ellipsis.svg" v-on:click="$emit('edit-board')" />
-            <Toast content="Board" :show="edit" @toggle-handler="$emit('edit-board')" />
+            <Toast content="Board" :show="edit" :route="route.params.children" @toggle-handler="$emit('edit-board')" />
         </div>
-        <add-new-task :show="show" @toggle-handler="$emit('toggle-handler')"></add-new-task>
+        <add-new-task :show="show" :route="route.params.children" @toggle-handler="$emit('toggle-handler')"></add-new-task>
     </header>
 </template>
 <style scoped>
@@ -50,7 +62,8 @@ header {
     width: calc(100% - 250px);
 }
 
-.logo {
+.logo,
+.mobile {
     padding: 1rem 1rem;
     align-items: center;
     display: flex;
@@ -59,12 +72,18 @@ header {
     position: relative;
 }
 
-.logo img {
+.mobile {
+    display: none;
+}
+
+.logo img,
+.mobile img {
     padding-right: 1rem;
     height: 25px;
 }
 
-.logo+h1 {
+.logo+h1,
+.mobile+h1 {
     padding-left: 1rem;
 }
 
@@ -75,7 +94,6 @@ header {
     width: 1px;
     right: 0;
     background-color: var(--line);
-    /* border-left: 1px solid var(--line); */
 }
 
 h1 {
@@ -88,6 +106,10 @@ h1 {
 .button {
     display: flex;
     gap: 1rem;
+}
+
+.button button:last-of-type {
+    display: none;
 }
 
 button {
@@ -111,5 +133,72 @@ button {
 button:disabled {
     opacity: 0.2;
     cursor: not-allowed;
+}
+
+.caret {
+    height: initial !important;
+}
+
+@media screen and (max-width:768px) {
+    .toggle_ {
+        left: 200px;
+        width: calc(100% - 200px);
+    }
+
+    .logo {
+        padding: 0.2rem 0.2rem;
+    }
+}
+
+@media screen and (max-width: 520px) {
+    .toggle_ {
+        left: 0;
+        width: 100%;
+    }
+
+    .logo+h1 {
+        display: none;
+    }
+
+    .mobile {
+        padding: 0.4rem 0.4rem;
+    }
+
+    .mobile h1 {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5em;
+        font-size: 18px;
+    }
+
+    .span {
+        display: none !important;
+    }
+
+    .caret {
+        height: initial;
+        cursor: pointer;
+    }
+
+    .h1 {
+        display: none;
+    }
+
+    .mobile {
+        display: flex;
+    }
+
+    .button button:first-of-type {
+        display: none;
+    }
+
+    .button button:last-of-type {
+        display: flex;
+    }
+
+    .logo {
+        display: none;
+    }
 }
 </style>

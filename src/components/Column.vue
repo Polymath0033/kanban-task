@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import Card from './UI/Card.vue';
 import type { Columns } from '@/types/Data';
-const props = defineProps<{ columns: Columns }>();
+import Card from './UI/Card.vue';
+const props = defineProps<{ columns: Columns }>()
+// v-if="col.tasks.length > 0"
 </script>
 <template>
     <menu v-for="col in props.columns" :key="col.name">
-        <h6 class="title" v-if="col.tasks.length > 0"> <span></span>{{ col.name }} ({{ col.tasks.length }})</h6>
+        <h6 class="title"> <span></span>{{ col.name }} ({{ col.tasks.length }})</h6>
         <Card v-for="task in col.tasks" :key="task.title" :title="task.title" :subtasks="task.subtasks" :columns="columns"
             :col="col.name" />
     </menu>
@@ -24,6 +25,7 @@ menu {
     letter-spacing: 2.4px;
     color: var(--gray);
     align-items: center;
+    width: 250px;
 }
 
 .title span {
@@ -49,7 +51,7 @@ menu:nth-of-type(3) .title span {
 aside {
     height: calc(100vh - 120px);
     border-radius: 6px;
-    background: #E9EFFA;
+    background: var(--aside);
     color: #828FA3;
     display: flex;
     justify-content: center;

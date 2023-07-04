@@ -53,6 +53,10 @@ img {
     border-radius: 34px;
 }
 
+.inner:hover {
+    background-color: var(--hover);
+}
+
 .inner::before {
     content: '';
     position: absolute;

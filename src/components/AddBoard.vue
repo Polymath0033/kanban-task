@@ -5,10 +5,11 @@ import { ref } from 'vue';
 import { useStore } from '@/store_';
 import Cancel from './icons/Cancel.vue';
 import type { Board, Columns } from '@/types/Data';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 defineProps<{ show: boolean }>();
 const emit = defineEmits<{ (e: 'toggle-handler'): void }>()
 const store = useStore();
+const route = useRoute()
 const router = useRouter();
 const title: Ref<string> = ref('')
 const columns: Ref<{ val: '', isValid: boolean }[]> = ref([{ val: '', isValid: false }, { val: '', isValid: false }]);
@@ -45,7 +46,7 @@ const addBoard = () => {
     for (let i = 0; i < columns.value.length; i++) {
         columns.value[i].val = '';
     }
-    router.push(title.value)
+    router.replace(`/${payload.name}`)
 }
 const blurHandler: (index: number) => void = (index) => {
     isTitleValid = false;
@@ -69,10 +70,10 @@ const blurHandler: (index: number) => void = (index) => {
                         <input type="text" v-model="column.val" @blur="blurHandler(index)" />
                     </div>
                     <i v-on:click="removeColumns(index)">
-                        <Cancel />
+                        <Cancel :is-valid="column.isValid" />
                     </i>
                 </div>
-                <button type="button" v-on:click="addColumns">Add new Tasks</button>
+                <button type="button" v-on:click="addColumns">Add Columns</button>
             </div>
             <button type="submit" class="submit">Create Board</button>
         </form>

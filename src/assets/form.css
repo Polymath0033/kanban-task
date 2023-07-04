@@ -127,7 +127,8 @@ button[type='submit']:hover {
   align-items: center;
 }
 
-.error input {
+.error input,
+.title-error input {
   border: 1px solid var(--error);
 }
 

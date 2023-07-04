@@ -4,7 +4,7 @@ import { useStore } from '../store_/index';
 import Column from './Column.vue';
 import type { ComputedRef } from 'vue';
 import type { Data, Boards, Columns } from '@/types/Data';
-import { ref, watch, computed, onMounted } from 'vue';
+import { ref, watchEffect, computed, onMounted, watch, nextTick } from 'vue';
 import Button from '../components/UI/Button.vue'
 import type { Ref } from 'vue';
 const router = useRoute();
@@ -16,18 +16,31 @@ for (const a of data) {
   k = [...a.boards]
 }
 let columns: Ref<Columns> = ref([]);
+const addTask = () => {
+  store.dispatch('toggleModal')
+}
 const filterData: (route: string | string[]) => void = (route) => {
   let filter = (k.filter(({ name }) => name === route)).filter(({ columns }) => columns);
   for (const a of filter) {
     columns.value = a.columns
   }
 }
-watch(
 
-  () => router.params.children, (newRoute: string | string[], oldRoute) => {
-    filterData(newRoute)
-  }
-)
+
+watch(() => router.params.children, (newRoute, oldRoute) => {
+  filterData(newRoute)
+  nextTick(() => {
+    console.log(columns.value)
+  })
+
+}, { immediate: true, deep: true })
+watch(() => columns.value, () => {
+  filterData(router.params.children)
+  nextTick(() => {
+    console.log(columns.value)
+  })
+
+})
 onMounted(() => {
   const initialRoute = router.params.children;
   filterData(initialRoute)
@@ -38,9 +51,10 @@ onMounted(() => {
   <section v-if="columns.length < 1" :style="{ left: space ? 0 + 'px' : 250 + 'px' }" :class="!space ? 'space' : ''"
     class="div">
     <p>This board is empty,Create new column to get started.</p>
-    <Button value="+ Add new column" />
+    <Button value="+ Add new column" @click-handler="addTask" />
   </section>
-  <section v-else :style="{ left: space ? 0 + 'px' : 250 + 'px' }">
+
+  <section v-else :class="!space ? 'left' : ''">
     <Column :columns="columns" />
   </section>
 </template>
@@ -57,6 +71,33 @@ section {
 
 .space {
   width: calc(100% - 250px) !important;
+  left: 250px;
+}
+
+.left {
+  left: 250px !important;
+}
+
+@media screen and (max-width:768px) {
+  .space {
+    width: calc(100% - 200px) !important;
+    left: 200px;
+  }
+
+  .left {
+    left: 200px !important;
+  }
+}
+
+@media screen and (max-width: 520px) {
+  .space {
+    width: 100% !important;
+    left: 0 !important;
+  }
+
+  .left {
+    left: 0px !important;
+  }
 }
 
 .div {

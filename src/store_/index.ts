@@ -2,7 +2,19 @@
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
 //@ts-ignore
 import data from '../lib/data.json'
-import type { Data, Boards, Tasks, SubTasks, Columns, Board, Task } from '@/types/Data'
+import type {
+  Data,
+  Tasks,
+  Columns,
+  Board,
+  AddTask,
+  DeleteTask,
+  EditBoard,
+  EditTask,
+  UpdateStatus,
+  ToggleCompleted,
+  AddColumn
+} from '@/types/Data'
 import type { InjectionKey } from 'vue'
 export interface State {
   hello: string
@@ -11,43 +23,7 @@ export interface State {
   modal: boolean
   edit: boolean
 }
-export interface AddTask {
-  routeName: string | string[]
-  column: string
-  payload: Task
-}
-export interface DeleteTask {
-  routeName: string | string[]
-  column: string
-  title: string
-}
-export interface EditBoard {
-  boardIndex: number
-  boardName: string
-  columnIndexes: number[]
-  columnNames: string[]
-}
-export interface EditTask {
-  boardIndex: number
-  columnIndex: number
-  tasksIndex: number
-  tasksInput: Task
-  subtasksIndexes: number[]
-  subtasksInputs: { title: string; isCompleted: boolean }[]
-}
-export interface ToggleCompleted {
-  boardIndex: number
-  columnIndex: number
-  taskIndex: number
-  subtaskIndex: number
-}
-export interface UpdateStatus {
-  boardIndex: number
-  columnIndex: number
-  taskIndex: number
-  title: string
-  status: string
-}
+
 export const key: InjectionKey<Store<State>> = Symbol()
 export const store = createStore({
   state: {
@@ -206,30 +182,49 @@ export const store = createStore({
       if (data) {
         const boards = data.boards[payload.boardIndex]
         if (boards && boards.columns) {
-          const task = boards.columns.flatMap((column) => column.tasks)[payload.taskIndex]
+          const flattenedTask = boards.columns.flatMap((column) => column.tasks)
+          const task = flattenedTask[payload.taskIndex]
+          console.log(task)
           if (task) {
+            const updateTask = { ...task }
             if (payload.status !== undefined) {
               const newStatus = payload.status
                 ? findMatchColumn(boards.columns, payload.status)
                 : ''
-              if (task.status !== newStatus) {
+              if (updateTask.status !== newStatus) {
                 const currentColumn = boards.columns.find(({ tasks }) => tasks.includes(task))
-                console.log(boards.columns.find(({ name }) => name === newStatus))
-
                 if (currentColumn) {
+                  currentColumn.tasks.splice(currentColumn.tasks.length - 1, 1)
                   const newColumn = boards.columns.find(({ name }) => name === newStatus)
-                  console.log(newColumn)
-                  console.log(task)
                   if (newColumn) {
-                    currentColumn.tasks.splice(payload.taskIndex, 1)
-                    newColumn.tasks.push(task)
-                    task.status = newStatus
+                    const updateColumn = [...boards.columns]
+                    const currentColumnIndex = updateColumn.findIndex(
+                      (column) => column === currentColumn
+                    )
+                    if (currentColumnIndex !== -1) {
+                      updateColumn[currentColumnIndex] = {
+                        ...currentColumn,
+                        tasks: currentColumn.tasks.filter((t) => t !== task)
+                      }
+                    }
+                    newColumn.tasks = [...newColumn.tasks, updateTask]
+                    updateTask.status = newStatus
+                    flattenedTask[payload.taskIndex] = updateTask
+                    boards.columns = updateColumn
                   }
-                  console.log(newColumn)
                 }
               }
             }
           }
+        }
+      }
+    },
+    addColumn: (state: State, payload: AddColumn) => {
+      const data = state.data[0].boards
+      if (data) {
+        const boards = data.find(({ name }) => name === payload.route)
+        if (boards) {
+          boards.columns.push(payload.column)
         }
       }
     }
@@ -270,6 +265,9 @@ export const store = createStore({
     },
     updateStatus: ({ commit }: any, payload: UpdateStatus) => {
       commit('updateStatus', payload)
+    },
+    addColumn: ({ commit }: any, payload: AddColumn) => {
+      commit('addColumn', payload)
     }
   }
 })

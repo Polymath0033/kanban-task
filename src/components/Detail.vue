@@ -21,7 +21,11 @@ const toggleToast = () => {
     // toggleHandler();
     emit('toggle-handler')
 }
-const select_: Ref<string> = ref('')
+let status: string[] = [];
+let title_ = '';
+let status_ = ''
+
+const select_: Ref<string> = ref(props.col)
 const boardIndex = data[0].boards.findIndex(({ name }) => name === route.params.children);
 const filterBoard = data[0].boards.filter(({ name }) => name === route.params.children);
 let columns: Columns = [];
@@ -53,12 +57,16 @@ const selectHandler: (param: Task, col: string) => void = (param, col) => {
     }
     console.log(select_.value)
     const taskIndex = tasks.findIndex(({ title }) => title === param.title);
-    const payload = { boardIndex: boardIndex, taskIndex: taskIndex, status: select_.value }
+    let task = []
+    const flatTask = data[0].boards[boardIndex].columns.flatMap((col) => col.tasks)
+    console.log(flatTask)
+    task = [...flatTask]
+    console.log(task)
+    const indexTask = task.findIndex((ts) => ts.title === title_)
+    console.log(indexTask)
+    const payload = { boardIndex: boardIndex, taskIndex: indexTask, title: title_, status: select_.value }
     store.dispatch('updateStatus', payload)
 }
-let status: string[] = [];
-let title_ = '';
-let status_ = ''
 
 const filterHandler: (router: string | string[]) => void = (router) => {
     let k: Boards = [];
@@ -117,7 +125,8 @@ onMounted(() => {
                 <i role="button" v-on:click="toggleHandler">
                     <VerticalEllipsis />
                 </i>
-                <edit-toast :show="toggle" :title="title_" :name="props.col" @toggle-handler="toggleHandler"></edit-toast>
+                <edit-toast :show="toggle" :title="title_" :name="props.col" :route-name="route.params.children"
+                    @toggle-modal="$emit('toggle-handler')" @toggle-handler="toggleHandler"></edit-toast>
             </div>
             <p>{{ detail.description }}</p>
             <div class=" form">
@@ -137,7 +146,7 @@ onMounted(() => {
                 </form>
             </div>
             <div class="select">
-                <h4>Current status {{ status.length }} {{ select_ }}</h4>
+                <h4>Current status: </h4>
                 <select name="" v-model="select_" v-on:change="selectHandler(detail, props.col)" id="">
                     <option v-for="option in status" :value="option" :selected="option === detail.status">{{ option }}
                     </option>

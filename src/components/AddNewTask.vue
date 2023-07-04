@@ -2,17 +2,58 @@
 import Modal from './UI/Modal.vue';
 import Cancel from './icons/Cancel.vue';
 import { selectInjectionKeys } from '../InjectionKey';
-import { inject, onUpdated, reactive, ref } from 'vue';
+import { inject, onUpdated, reactive, ref, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import type { Ref } from 'vue';
 import { useStore } from '../store_';
-defineProps<{ show: boolean }>();
+import type { Boards, Columns, Data } from '@/types/Data';
+const props = defineProps<{ show: boolean, route: string | string[] }>();
 const emit = defineEmits<{ (e: 'toggle-handler'): void }>()
 const route = useRoute();
 const store = useStore();
-const select_ = inject(selectInjectionKeys);
+let select_: string[] = []
 const title: { val: string, isValid: boolean } = reactive({ val: '', isValid: false })
 const description: Ref<string> = ref('')
+let k: Boards = [];
+const data: Data[] = store.getters.data
+
+console.log(data)
+for (const a of data) {
+    k = [...a.boards]
+}
+
+console.log(props.route)
+const filterData: (route: string | string[]) => void = (route) => {
+    let column: Columns = []
+    let filter = (k.filter(({ name }) => name === route)).filter(({ columns }) => columns);
+    for (const a of filter) {
+        column = a.columns
+    }
+    let s: string[] = [];
+    column.forEach(({ name }) => {
+        s.push(name)
+        select_ = [...s]
+    }
+    )
+}
+watch(() => route.params.children, (newRoute, oldRoute) => {
+    filterData(newRoute)
+})
+onMounted(() => {
+    const initialRoute = route.params.children;
+    filterData(initialRoute)
+})
+// const filter = k.filter((k_) => k_.name === props.route)
+// for (const a of filter) {
+//     column = (a.columns)
+// }
+// console.log(column)
+// for (const a of column) {
+//     console.log(a.name)
+//     select_.push(a.name)
+// }
+console.log(select_)
+console.log(select_)
 const subtasks: Ref<{ val: '', isValid: boolean }[]> = ref([{ val: '', isValid: false }, { val: "", isValid: false }]);
 const addSubtasks: () => void = () => {
     subtasks.value.push({ val: '', isValid: false })
@@ -62,11 +103,12 @@ const addNewTask = () => {
     const payload = { routeName, column: selected.val, payload: payload_task };
     store.dispatch('addTask', payload);
     console.log(store.getters.data)
-    console.log(payload)
     title.val = '';
+    title.isValid = false
     description.value = '';
     for (const subtask of subtasks.value) {
         subtask.val = ''
+        subtask.isValid = false
     }
     selected.val = ''
     emit('toggle-handler')
@@ -78,7 +120,7 @@ onUpdated(() => {
 
 </script>
 <template>
-    <modal :show="show" @toggle-handler="$emit('toggle-handler')" :top="3">
+    <modal :show="props.show" @toggle-handler="$emit('toggle-handler')" :top="3">
         <form v-on:submit.prevent="addNewTask">
             <h2>Add new task</h2>
             <div class="form-control" :class="title.isValid ? 'title-error' : ''">
@@ -99,7 +141,7 @@ onUpdated(() => {
                         <input type="text" v-model="subtask.val" @blur="blurHandler(index)" />
                     </div>
                     <i v-on:click="removeSubtasks(index)">
-                        <Cancel />
+                        <Cancel :is-valid="subtask.isValid" />
                     </i>
                 </div>
                 <button type="button" v-on:click="addSubtasks">Add new Tasks</button>

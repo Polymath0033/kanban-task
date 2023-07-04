@@ -136,13 +136,13 @@ const editTask = () => {
                         <input type="text" v-model="subtask.val" />
                     </div>
                     <i v-on:click="removeSubtasks(index)">
-                        <Cancel />
+                        <Cancel :is-valid='subtask.isValid' />
                     </i>
                 </div>
                 <button type="button" v-on:click="addSubtasks">Add new Tasks</button>
             </div>
             <div class="status">
-                <h4>Status</h4>
+                <h4>Status </h4>
                 <select>
                     <option v-for="value in select" :key="value" :selected='value === task.status'>{{ value }}</option>
                 </select>

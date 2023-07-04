@@ -13,15 +13,16 @@ const store = useStore();
 const routeName = route.params.children;
 const router = useRouter()
 let isTitleValid = false;
-const title: Ref<string> = ref(''); const tasks: Ref<{ val: string, isValid: boolean }[]> = ref([{ val: '', isValid: false }])
+const title: Ref<string | string[]> = ref('');
+const tasks: Ref<{ val: string, isValid: boolean }[]> = ref([{ val: '', isValid: false }])
 const data: Data[] = store.getters.data;
 let k: Boards = [];
 for (const a of data) {
     k = [...a.boards]
 }
+let columns_: Columns = [];
 const filterData: (board: string | string[]) => void = (board) => {
     const filter = k.filter(({ name }) => name === board);
-    let columns_: Columns = [];
     filter.forEach(({ name, columns }) => {
         title.value = name;
         columns_ = [...columns]
@@ -35,6 +36,7 @@ const filterData: (board: string | string[]) => void = (board) => {
         tasks.value.length = columns_.length
     }
 }
+
 const blurHandler: (index: number) => void = (index) => {
     tasks.value[index].isValid = false;
     isTitleValid = false
@@ -44,8 +46,6 @@ const addColumns: () => void = () => {
 }
 const removeColumns: (index: number) => void = index => {
     tasks.value.splice(index, 1)
-    console.log(index)
-
 }
 const editBoard: () => void = () => {
     const filter = k.filter(({ name }) => name === routeName);
@@ -66,6 +66,7 @@ const editBoard: () => void = () => {
         if (i < tasks.value.length) {
             newObj.name = tasks.value[i].val
         }
+        console.log(newObj)
         newArray.push(newObj)
     }
     const columnIndexes: number[] = [];
@@ -77,15 +78,18 @@ const editBoard: () => void = () => {
     const payload = { boardIndex: boardIndex, boardName: title.value, columnIndexes: columnIndexes, columnNames: columnNames };
     store.dispatch('editBoard', payload)
     route.params.children = title.value;
+    console.log(store.getters.data)
     router.replace({ path: `/${title.value}` })
     console.log(route.params.children)
     emit('toggle-handler')
 }
 watch(() => route.params.children, (newRoute, oldRoute) => {
     filterData(newRoute)
-})
+    title.value = newRoute
+}, { immediate: true })
 onMounted(() => {
     const initialRoute = route.params.children;
+    title.value = initialRoute;
     filterData(initialRoute)
 })
 
@@ -103,11 +107,11 @@ onMounted(() => {
             <div class="subtasks">
                 <h4>Columns</h4>
                 <div v-for="(task, index) in tasks" :key="index" class="form-flex">
-                    <div>
+                    <div :class="task.isValid === true ? 'error' : ''">
                         <input type="text" v-model="task.val" @blur="blurHandler(index)" />
                     </div>
                     <i v-on:click="removeColumns(index)">
-                        <Cancel />
+                        <Cancel :is-valid="task.isValid" />
                     </i>
                 </div>
                 <button type="button" v-on:click="addColumns">Add new column</button>

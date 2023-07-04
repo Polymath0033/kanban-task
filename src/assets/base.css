@@ -33,6 +33,7 @@
     --primary-btn: var(--main-purple);
     --hover-btn: var(--light-bg);
     --secondary-hover: rgba(99, 95, 199, 0.25);
+    --aside: #E9EFFA;
 }
 
 :root.dark {
@@ -49,6 +50,7 @@
     --primary-btn: '';
     --hover-btn: var(--vt-c-white);
     --secondary-hover: var(--vt-c-white);
+    --aside: #2B2C37
 }
 
 *,
