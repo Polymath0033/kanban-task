@@ -31,6 +31,7 @@ menu {
     color: var(--gray);
     align-items: center;
     width: 250px;
+    font-size:13px;
     text-transform: uppercase;
 }
 
