@@ -78,6 +78,8 @@ onMounted(() => {
   // filterData(initialRoute)
 
 })
+const hasRoute: ComputedRef<number> = computed(() => data.value[0].boards.findIndex(({ name }) => name === route.params.children))
+
 </script>
 
 <template>
@@ -89,7 +91,7 @@ onMounted(() => {
       <Header :toggle="toggle" :theme="theme" :show="show" :columns="columns" @toggle-theme="toggleTheme"
         :edit="editBoard" @edit-board="editBoardHandler" @toggle-handler="toggleHandler" />
       <main>
-        <div class="div">
+        <div v-if="hasRoute === -1" class="div">
           <Button value="Add New Board" @click-handler="createBoard" />
         </div>
         <button class="button" v-if="toggle" v-on:click="btnToggle">
