@@ -74,6 +74,9 @@ onMounted(() => {
   if (initial_theme) {
     setTheme(initial_theme)
   }
+  if (route_.length !== 0) {
+    router.replace(`/${route_[0]}`)
+  }
   const initialRoute = route.params.children;
   // filterData(initialRoute)
 
