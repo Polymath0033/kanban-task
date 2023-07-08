@@ -3,12 +3,10 @@ import { RouterView, useRoute, useRouter } from 'vue-router'
 import Header from './components/Header.vue';
 import IconShow from './components/icons/IconShow.vue'
 import SideBar from '@/components/SideBar.vue';
+import Button from './components/UI/Button.vue';
 import { ref, onMounted, computed, provide, reactive, watch } from 'vue';
 import { selectInjectionKeys } from './InjectionKey';
 import type { Ref, ComputedRef } from 'vue';
-//@ts-ignore
-import Button from '@/components/ui/Button.vue'
-//@ts-ignore
 import { useStore } from './store_/index';
 import type { Data, Boards, Columns } from './types/Data';
 const store = useStore();
