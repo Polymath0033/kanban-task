@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Modal from './UI/Modal.vue';
-import type { Ref } from 'vue';
-import { ref } from 'vue';
+import type { Ref, ComputedRef } from 'vue';
+import { ref, computed } from 'vue';
 import { useStore } from '@/store_';
 import Cancel from './icons/Cancel.vue';
 import type { Board, Columns } from '@/types/Data';
@@ -10,6 +10,10 @@ defineProps<{ show: boolean }>();
 const emit = defineEmits<{ (e: 'toggle-handler'): void }>()
 const store = useStore();
 const route = useRoute()
+const board: ComputedRef<boolean> = computed(() => store.getters.board)
+const toggleBoard = () => {
+    store.dispatch('toggleBoard')
+}
 const router = useRouter();
 const title: Ref<string> = ref('')
 const columns: Ref<{ val: '', isValid: boolean }[]> = ref([{ val: '', isValid: false }, { val: '', isValid: false }]);
@@ -21,9 +25,7 @@ let isTitleValid = false;
 const removeColumns: (position: number) => void = (position) => {
     columns.value.splice(position, 1)
 }
-for (let i = 0; i < columns.value.length; i++) {
-    console.log(columns.value[i].val)
-}
+
 const addBoard = () => {
     if (title.value === '') {
         isTitleValid = true;
@@ -41,6 +43,7 @@ const addBoard = () => {
     }
     const payload: Board = { name: title.value, columns: task }
     store.dispatch('addBoard', payload);
+    store.dispatch('toggleBoard')
     emit('toggle-handler')
     title.value = '';
     for (let i = 0; i < columns.value.length; i++) {
@@ -55,7 +58,7 @@ const blurHandler: (index: number) => void = (index) => {
 
 </script>
 <template>
-    <modal v-on:toggle-handler="$emit('toggle-handler')" :show="show">
+    <modal v-on:toggle-handler="toggleBoard" :show="board">
         <form v-on:submit.prevent="addBoard">
             <h2>Add new board</h2>
             <div class="form-control" :class="isTitleValid === true ? 'error' : ''">

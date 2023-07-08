@@ -1,27 +1,42 @@
 <script setup lang="ts">
-import type { Boards } from '@/types/Data';
+import type { Boards, Data } from '@/types/Data';
 import Board from '../icons/Board.vue'
 import AddBoard from '../AddBoard.vue';
-defineProps<{ toggle: boolean, routes: Boards }>()
-defineEmits<{ (e: 'toggle-handler'): void }>()
+import { type ComputedRef, computed } from 'vue';
+import { useStore } from '@/store_';
+defineProps<{ toggle: boolean }>()
+defineEmits<{ (e: 'toggle-handler'): void, (e: 'dropdown'): void }>()
+const store = useStore()
+const data: ComputedRef<Data[]> = computed(() => store.getters.data)
+const routes: ComputedRef<Boards> = computed(() => {
+    let k: Boards = []
+    data.value[0].boards.forEach((a) => {
+        k.push(a)
+    })
+    return k
+})
+const board: ComputedRef<boolean> = computed(() => store.getters.board)
+const toggleBoard = () => {
+    store.dispatch('toggleBoard')
+}
 </script>
 <template >
     <nav class="list">
         <p>all board{{ routes.length > 2 ? 's' : '' }} ({{ routes.length }})</p>
-        <router-link v-for="route_ in routes" :to="route_.name">
+        <router-link @click="$emit('dropdown')" v-for="route_ in routes" :to="route_.name">
             <i>
                 <Board />
             </i>
             {{ route_.name
             }}
         </router-link>
-        <button v-on:click="$emit('toggle-handler')">
+        <button v-on:click="toggleBoard">
             <i>
                 <Board color="#635fc7" />
             </i>
             + Create New Board
         </button>
-        <AddBoard :show="toggle" @toggle-handler="$emit('toggle-handler')" />
+        <AddBoard :show="board" @toggle-handler="toggleBoard" />
     </nav>
 </template>
 <style scoped>
@@ -58,6 +73,10 @@ nav a,
     border-bottom-right-radius: 100px;
     color: var(--gray);
     cursor: pointer;
+}
+
+nav a {
+    text-transform: capitalize;
 }
 
 .list button {

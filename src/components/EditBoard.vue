@@ -1,42 +1,60 @@
 <script setup lang="ts">
 import Modal from './UI/Modal.vue';
 import { useStore } from '@/store_';
-import type { Boards, Data, Columns, Tasks } from '@/types/Data';
+import type { Data, Columns, Tasks } from '@/types/Data';
 import { useRoute, useRouter } from 'vue-router';
-import { ref, watch, onMounted, onUpdated } from 'vue';
+import { ref, watch, onMounted, type ComputedRef, computed } from 'vue';
 import type { Ref } from 'vue';
 import Cancel from './icons/Cancel.vue'
-defineProps<{ show: boolean }>()
-const emit = defineEmits<{ (e: 'toggle-handler'): void }>();
+
 const route = useRoute();
 const store = useStore();
-const routeName = route.params.children;
+
 const router = useRouter()
 let isTitleValid = false;
 const title: Ref<string | string[]> = ref('');
-const tasks: Ref<{ val: string, isValid: boolean }[]> = ref([{ val: '', isValid: false }])
-const data: Data[] = store.getters.data;
-let k: Boards = [];
-for (const a of data) {
-    k = [...a.boards]
+let tasks: Ref<{ val: string; isValid: boolean }[]> = ref([])
+const data: ComputedRef<Data[]> = computed(() => store.getters.data);
+const modal: ComputedRef<boolean> = computed(() => store.state.modal)
+const toggleModal = () => {
+    store.dispatch('toggleModal')
 }
-let columns_: Columns = [];
-const filterData: (board: string | string[]) => void = (board) => {
-    const filter = k.filter(({ name }) => name === board);
-    filter.forEach(({ name, columns }) => {
-        title.value = name;
-        columns_ = [...columns]
-    })
-    if (tasks.value.length < columns_.length) {
-        tasks.value = [];
-        for (const col of columns_) {
-            tasks.value.push({ val: col.name, isValid: false })
-        }
-    } else if (tasks.value.length > columns_.length) {
-        tasks.value.length = columns_.length
+const filterTask: (routeName: string | string[]) => { val: string; isValid: boolean }[] = (routeName) => {
+    const filtered = (data.value[0].boards.filter(({ name }) => name === routeName))
+    let columns: Columns = []
+    for (const a of filtered) {
+        columns = a.columns
     }
+    let tasks_: { val: string; isValid: boolean }[] = []
+    if (tasks_.length < columns.length) {
+        tasks_ = [];
+        for (const col of columns) {
+            tasks_.push({ val: col.name, isValid: false })
+        }
+    } else if (tasks_.length > columns.length) {
+        tasks_.length = columns.length
+    }
+    return tasks_
 }
+watch(() => route.params.children, (newRoute, oldRoute) => {
+    title.value = newRoute
+    tasks.value = filterTask(newRoute)
+}, { immediate: true })
 
+onMounted(() => {
+    const initialRoute = route.params.children;
+    title.value = initialRoute;
+    console.log(modal.value)
+})
+const filterData = computed(() => {
+    const k = data.value[0].boards.filter(({ name }) => name === route.params.children)
+    let col: Columns = []
+    for (const a of k) {
+        col = a.columns
+    }
+    return col
+})
+console.log(tasks.value)
 const blurHandler: (index: number) => void = (index) => {
     tasks.value[index].isValid = false;
     isTitleValid = false
@@ -48,25 +66,17 @@ const removeColumns: (index: number) => void = index => {
     tasks.value.splice(index, 1)
 }
 const editBoard: () => void = () => {
-    const filter = k.filter(({ name }) => name === routeName);
-    const boardIndex = k.findIndex(({ name }) => name === route.params.children);
-    console.log(boardIndex)
-    console.log(route.params.children)
-    let columns_: Columns = [];
-    filter.forEach(({ columns }) => {
-        columns_ = [...columns]
-    })
+    const boardIndex = data.value[0].boards.findIndex(({ name }) => name === route.params.children);
     const newArray = [];
-    const maxLength = Math.max(tasks.value.length, columns_.length)
+    const maxLength = Math.max(tasks.value.length, filterData.value.length)
     for (let i = 0; i < maxLength; i++) {
         const newObj: { name: string, task: Tasks } = { name: '', task: [] }
-        if (i < columns_.length) {
-            newObj.task = columns_[i].tasks
+        if (i < filterData.value.length) {
+            newObj.task = filterData.value[i].tasks
         }
         if (i < tasks.value.length) {
             newObj.name = tasks.value[i].val
         }
-        console.log(newObj)
         newArray.push(newObj)
     }
     const columnIndexes: number[] = [];
@@ -78,26 +88,16 @@ const editBoard: () => void = () => {
     const payload = { boardIndex: boardIndex, boardName: title.value, columnIndexes: columnIndexes, columnNames: columnNames };
     store.dispatch('editBoard', payload)
     route.params.children = title.value;
-    console.log(store.getters.data)
     router.replace({ path: `/${title.value}` })
-    console.log(route.params.children)
-    emit('toggle-handler')
+    toggleModal()
 }
-watch(() => route.params.children, (newRoute, oldRoute) => {
-    filterData(newRoute)
-    title.value = newRoute
-}, { immediate: true })
-onMounted(() => {
-    const initialRoute = route.params.children;
-    title.value = initialRoute;
-    filterData(initialRoute)
-})
+
 
 </script>
 <template>
-    <modal :show="show" v-on:toggle-handler="$emit('toggle-handler')">
+    <modal :show="modal" v-on:toggle-handler="toggleModal">
         <form v-on:submit.prevent="editBoard">
-            <h2>Edit board{{ title }}
+            <h2>Edit board
             </h2>
             <div class="form-control" :class="isTitleValid === true ? 'error' : ''">
                 <label for="name">Name</label>

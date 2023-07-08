@@ -55,15 +55,11 @@ const selectHandler: (param: Task, col: string) => void = (param, col) => {
     for (const task of filterColumns) {
         tasks = task.tasks
     }
-    console.log(select_.value)
-    const taskIndex = tasks.findIndex(({ title }) => title === param.title);
+
     let task = []
     const flatTask = data[0].boards[boardIndex].columns.flatMap((col) => col.tasks)
-    console.log(flatTask)
     task = [...flatTask]
-    console.log(task)
     const indexTask = task.findIndex((ts) => ts.title === title_)
-    console.log(indexTask)
     const payload = { boardIndex: boardIndex, taskIndex: indexTask, title: title_, status: select_.value }
     store.dispatch('updateStatus', payload)
 }
@@ -121,12 +117,13 @@ onMounted(() => {
     <modal :show="props.show" @toggle-handler="$emit('toggle-handler')">
         <div v-for="detail in fh" class="grid">
             <div class="top" role="alert">
-                <h2> {{ detail.title }} {{ status_ }} </h2>
+                <h2> {{ detail.title }} </h2>
                 <i role="button" v-on:click="toggleHandler">
                     <VerticalEllipsis />
                 </i>
-                <edit-toast :show="toggle" :title="title_" :name="props.col" :route-name="route.params.children"
-                    @toggle-modal="$emit('toggle-handler')" @toggle-handler="toggleHandler"></edit-toast>
+                <edit-toast :show="toggle" :title="title_" :status="status" :name="props.col"
+                    :route-name="route.params.children" @toggle-modal="$emit('toggle-handler')"
+                    @toggle-handler="toggleHandler"></edit-toast>
             </div>
             <p>{{ detail.description }}</p>
             <div class=" form">

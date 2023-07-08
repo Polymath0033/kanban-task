@@ -13,7 +13,8 @@ const router = createRouter({
       path: '/:children',
       name: 'components',
       component: () => import('@/components/HelloWorld.vue')
-    }
+    },
+    { path: '/:notFound(.*)*', redirect: '/' }
   ]
 })
 

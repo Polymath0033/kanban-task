@@ -1,15 +1,21 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import { getImageLink } from '@/lib/getImageLink';
+import { useStore } from '../store_/index'
 import AddNewTask from './AddNewTask.vue';
 import Toast from './Toast.vue';
-import { ref, type Ref } from 'vue';
+import { ref, type Ref, computed, type ComputedRef } from 'vue';
+import { type Columns } from '@/types/Data';
 import Dropdown from './Dropdown.vue';
-defineProps<{ toggle: boolean, theme: string, show: boolean, edit: boolean }>();
+import { type Data } from '@/types/Data';
+defineProps<{ toggle: boolean, theme: string, show: boolean, edit: boolean, columns: Columns }>();
 defineEmits<{ (e: 'toggle-handler'): boolean, (e: 'edit-board'): void, (e: 'toggle-theme'): void }>();
 const dropdown: Ref<boolean> = ref(false);
 const dropdownHandler: () => boolean = () => dropdown.value = !dropdown.value;
 const route = useRoute();
+const store = useStore()
+const data: ComputedRef<Data[]> = computed(() => store.getters.data)
+const hasRoute = computed(() => data.value[0].boards.findIndex(({ name }) => name === route.params.children))
 </script>
 <template>
     <header :theme="theme" :toggle="toggle" :class="toggle ? 'toggle' : 'toggle_'">
@@ -17,22 +23,23 @@ const route = useRoute();
             <div class="logo">
                 <img :src="`${theme === 'light' ? getImageLink('logo-dark') : getImageLink('logo-light')}`" />
             </div>
-            <h1>{{ route.params.children }} </h1>
+            <h1>{{ hasRoute !== -1 ? route.params.children : '' }} </h1>
         </span>
         <span class="mobile">
             <div>
                 <img :src="getImageLink('logo-mobile')" />
             </div>
-            <h1>{{ route.params.children }} <img v-on:click="dropdownHandler" class="caret"
+            <h1>{{ hasRoute !== -1 ? route.params.children : "" }} <img v-on:click="dropdownHandler" class="caret"
                     :src="`${dropdown ? getImageLink('icon-chevron-up') : getImageLink('icon-chevron-down')}`" />
                 <Dropdown @dropdown-handler="dropdownHandler" @toggle-theme="$emit('toggle-theme')" :dropdown="dropdown" />
             </h1>
         </span>
-        <h1 v-if="!toggle" class="h1">{{ route.params.children }}</h1>
+        <h1 v-if="!toggle" class="h1">{{ hasRoute !== -1 ? route.params.children : "" }}</h1>
         <div class="button">
-            <button v-on:click="$emit('toggle-handler')">+Add New Task</button>
-            <button v-on:click="$emit('toggle-handler')">+</button>
-            <img src="../assets/icon-vertical-ellipsis.svg" v-on:click="$emit('edit-board')" />
+            <button :disabled="columns.length < 1" v-on:click="$emit('toggle-handler')">+Add New Task</button>
+            <button :disabled="columns.length < 1" v-on:click="$emit('toggle-handler')">+</button>
+            <img src="../assets/icon-vertical-ellipsis.svg" :disabled="columns.length < 1"
+                :class="columns.length < 1 ? 'img' : ''" v-on:click="$emit('edit-board')" />
             <Toast content="Board" :show="edit" :route="route.params.children" @toggle-handler="$emit('edit-board')" />
         </div>
         <add-new-task :show="show" :route="route.params.children" @toggle-handler="$emit('toggle-handler')"></add-new-task>
@@ -130,9 +137,11 @@ button {
     cursor: pointer;
 }
 
-button:disabled {
+button:disabled,
+img:disabled,
+.img {
     opacity: 0.2;
-    cursor: not-allowed;
+    cursor: not-allowed !important;
 }
 
 .caret {

@@ -22,6 +22,7 @@ export interface State {
   data: Data[]
   modal: boolean
   edit: boolean
+  board: boolean
 }
 
 export const key: InjectionKey<Store<State>> = Symbol()
@@ -31,7 +32,8 @@ export const store = createStore({
     toggle: false,
     data: [data],
     modal: false,
-    edit: false
+    edit: false,
+    board: false
   },
   getters: {
     hello(state: State) {
@@ -48,6 +50,9 @@ export const store = createStore({
     },
     edit: (state: State) => {
       return state.edit
+    },
+    board: (state: State) => {
+      return state.board
     }
   },
   mutations: {
@@ -56,6 +61,9 @@ export const store = createStore({
     },
     btnToggle(state: State) {
       state.toggle = !state.toggle
+    },
+    toggleBoard(state: State) {
+      state.board = !state.board
     },
     toggleModal(state: State, payload: string) {
       state.modal = !state.modal
@@ -170,7 +178,6 @@ export const store = createStore({
       }
     },
     updateStatus: (state: State, payload: UpdateStatus) => {
-      console.log(payload)
       const data = state.data[0]
       const findMatchColumn: (column: Columns, status: string) => string = (column, status) => {
         const matchColumn = column.find(
@@ -184,7 +191,6 @@ export const store = createStore({
         if (boards && boards.columns) {
           const flattenedTask = boards.columns.flatMap((column) => column.tasks)
           const task = flattenedTask[payload.taskIndex]
-          console.log(task)
           if (task) {
             const updateTask = { ...task }
             if (payload.status !== undefined) {
@@ -194,7 +200,6 @@ export const store = createStore({
               if (updateTask.status !== newStatus) {
                 const currentColumn = boards.columns.find(({ tasks }) => tasks.includes(task))
                 if (currentColumn) {
-                  currentColumn.tasks.splice(currentColumn.tasks.length - 1, 1)
                   const newColumn = boards.columns.find(({ name }) => name === newStatus)
                   if (newColumn) {
                     const updateColumn = [...boards.columns]
@@ -236,8 +241,11 @@ export const store = createStore({
     btnToggle({ commit }: any) {
       commit('btnToggle')
     },
+    toggleBoard({ commit }: any) {
+      commit('toggleBoard')
+    },
     toggleModal({ commit }: any, payload: string) {
-      commit('toggleModal', payload)
+      commit('toggleModal')
     },
     addBoard: ({ commit }: any, payload: Board) => {
       commit('addBoard', payload)

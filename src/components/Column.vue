@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import type { Columns } from '@/types/Data';
 import Card from './UI/Card.vue';
+import { useStore } from '../store_/index'
 const props = defineProps<{ columns: Columns }>()
+const store = useStore()
+const addColumn = () => {
+    store.dispatch('toggleModal')
+}
 // v-if="col.tasks.length > 0"
 </script>
 <template>
@@ -11,7 +16,7 @@ const props = defineProps<{ columns: Columns }>()
             :col="col.name" />
     </menu>
     <aside>
-        <h2>+ New Column</h2>
+        <button @click="addColumn">+ New Column</button>
     </aside>
 </template>
 <style scoped>
@@ -26,6 +31,7 @@ menu {
     color: var(--gray);
     align-items: center;
     width: 250px;
+    text-transform: capitalize;
 }
 
 .title span {
@@ -59,8 +65,10 @@ aside {
     width: 200px
 }
 
-aside h2 {
+aside button {
+    all: unset;
     font-size: 1.2rem;
     font-weight: 700;
+    cursor: pointer;
 }
 </style>

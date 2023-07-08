@@ -2,58 +2,43 @@
 import { useRoute } from 'vue-router';
 import { useStore } from '../store_/index';
 import Column from './Column.vue';
-import type { ComputedRef } from 'vue';
 import type { Data, Boards, Columns } from '@/types/Data';
-import { ref, watchEffect, computed, onMounted, watch, nextTick } from 'vue';
+import { computed, type ComputedRef } from 'vue';
 import Button from '../components/UI/Button.vue'
-import type { Ref } from 'vue';
 const router = useRoute();
 const store = useStore();
 const space: ComputedRef<boolean> = computed(() => store.getters.toggle)
-const data: Data[] = store.getters.data;
-let k: Boards = [];
-for (const a of data) {
-  k = [...a.boards]
-}
-let columns: Ref<Columns> = ref([]);
+const data: ComputedRef<Data[]> = computed(() => store.getters.data);
+const columns: ComputedRef<Columns> = computed(() => {
+  const filtered = (data.value[0].boards.filter(({ name }) => name === router.params.children))
+  let columns: Columns = []
+  for (const a of filtered) {
+    columns = a.columns
+  }
+
+  return columns
+});
+const hasRoute: ComputedRef<number> = computed(() => data.value[0].boards.findIndex(({ name }) => name === router.params.children))
 const addTask = () => {
   store.dispatch('toggleModal')
 }
-const filterData: (route: string | string[]) => void = (route) => {
-  let filter = (k.filter(({ name }) => name === route)).filter(({ columns }) => columns);
-  for (const a of filter) {
-    columns.value = a.columns
-  }
+const createBoard = () => {
+  store.dispatch('toggleBoard')
 }
-
-
-watch(() => router.params.children, (newRoute, oldRoute) => {
-  filterData(newRoute)
-  nextTick(() => {
-    console.log(columns.value)
-  })
-
-}, { immediate: true, deep: true })
-watch(() => columns.value, () => {
-  filterData(router.params.children)
-  nextTick(() => {
-    console.log(columns.value)
-  })
-
-})
-onMounted(() => {
-  const initialRoute = router.params.children;
-  filterData(initialRoute)
-})
+const modal: ComputedRef<boolean> = computed(() => store.getters.modal)
 </script>
 
 <template>
-  <section v-if="columns.length < 1" :style="{ left: space ? 0 + 'px' : 250 + 'px' }" :class="!space ? 'space' : ''"
+  <section v-if="hasRoute === -1" :style="{ left: space ? 0 + 'px' : 250 + 'px' }" :class="!space ? 'space' : ''">
+    <div class="div">
+      <Button value="Add New Board" @click-handler="createBoard" />
+    </div>
+  </section>
+  <section v-else-if="columns.length < 1" :style="{ left: space ? 0 + 'px' : 250 + 'px' }" :class="!space ? 'space' : ''"
     class="div">
     <p>This board is empty,Create new column to get started.</p>
     <Button value="+ Add new column" @click-handler="addTask" />
   </section>
-
   <section v-else :class="!space ? 'left' : ''">
     <Column :columns="columns" />
   </section>
@@ -109,6 +94,10 @@ section {
   height: calc(100vh - 84px);
   position: relative;
   gap: 1rem;
+}
+
+.div p {
+  text-align: center;
 }
 
 .div {

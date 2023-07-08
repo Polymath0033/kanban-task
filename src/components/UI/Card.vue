@@ -32,7 +32,6 @@ const clickHandler: (title: string) => void = (title) => {
     title_.value = title;
     let fh = gh.filter((g) => g.title === title)
     toggleHandler()
-    store.dispatch('toggleModal', title)
 }
 
 </script>

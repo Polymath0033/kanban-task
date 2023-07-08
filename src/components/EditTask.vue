@@ -1,20 +1,21 @@
 <script setup lang="ts">
 import Modal from './UI/Modal.vue';
 import Cancel from './icons/Cancel.vue';
-import { ref, inject, reactive, type Ref } from 'vue';
+import { ref, inject, reactive, type Ref, computed, type ComputedRef, watch, onMounted } from 'vue';
 import { useStore } from '@/store_';
 import type { Columns, Data, Tasks, SubTasks } from '@/types/Data';
 import { useRoute } from 'vue-router';
 import { selectInjectionKeys } from '@/InjectionKey';
-const props = defineProps<{ show: boolean, title: string, name: string }>();
+import type { Task } from '@/types/Data';
+const props = defineProps<{ show: boolean, title: string, name: string, status: string[] }>();
 const emit = defineEmits<{ (e: 'toggle-handler'): void }>();
 const store = useStore();
 const tasks: Ref<Tasks> = ref([])
 const data: Data[] = store.getters.data;
 const boards = data[0].boards;
 const route = useRoute();
-console.log(route.params.children);
-console.log(props.title)
+const select_: Ref<{ val: string, isValid: boolean }> = ref({ val: props.name, isValid: false })
+
 const filter = boards.filter(({ name }) => name === route.params.children);
 const boardIndex = boards.findIndex(({ name }) => name === route.params.children);
 const selected: { val: string, isValid: boolean } = reactive({ val: '', isValid: false })
@@ -42,7 +43,6 @@ if (tasks.value.length < filterTask.length) {
 } else if (tasks.value.length > filterTask.length) {
     tasks.value.length = filterTask.length
 }
-
 const subtasks: Ref<{ val: string, isValid: boolean }[]> = ref([])
 if (subtasks.value.length < subTasks.length) {
     subtasks.value = [];
@@ -60,7 +60,15 @@ const removeSubtasks: (index: number) => void = (index) => {
     subtasks.value.splice(index, 1)
 }
 let isTitleValid = false;
-const select = inject(selectInjectionKeys);
+
+const selectHandler: (col: string) => void = (col) => {
+    let tasks = []
+    const flatTask = data[0].boards[boardIndex].columns.flatMap((task) => task.tasks)
+    tasks = [...flatTask]
+    const taskIndex = tasks.findIndex((task) => task.title === props.title)
+    const payload = { boardIndex: boardIndex, taskIndex: taskIndex, title: props.title, status: select_.value.val }
+    store.dispatch('updateStatus', payload)
+}
 const editTask = () => {
     for (let i = 0; i < tasks.value.length; i++) {
         if (tasks.value[i].title === '') {
@@ -74,8 +82,8 @@ const editTask = () => {
             return;
         }
     }
-    if (selected.val === '') {
-        selected.isValid = true;
+    if (select_.value.val === '') {
+        select_.value.isValid = true;
         return;
     }
     const newSubtasks = [];
@@ -143,8 +151,10 @@ const editTask = () => {
             </div>
             <div class="status">
                 <h4>Status </h4>
-                <select>
-                    <option v-for="value in select" :key="value" :selected='value === task.status'>{{ value }}</option>
+                <select v-model="select_.val" v-on:change="selectHandler(select_.val)">
+                    <option v-for="value in props.status" :key="value" :selected="select_.val === value" :value="value">{{
+                        value
+                    }}</option>
                 </select>
             </div>
             <button type="submit" class="submit">Save changes</button>

@@ -1,59 +1,35 @@
 <script setup lang="ts">
 import Modal from './UI/Modal.vue';
 import Cancel from './icons/Cancel.vue';
-import { selectInjectionKeys } from '../InjectionKey';
-import { inject, onUpdated, reactive, ref, watch, onMounted } from 'vue';
+import { onUpdated, reactive, ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
-import type { Ref } from 'vue';
+import type { Ref, ComputedRef } from 'vue';
 import { useStore } from '../store_';
-import type { Boards, Columns, Data } from '@/types/Data';
+import type { Columns, Data } from '@/types/Data';
 const props = defineProps<{ show: boolean, route: string | string[] }>();
 const emit = defineEmits<{ (e: 'toggle-handler'): void }>()
 const route = useRoute();
 const store = useStore();
-let select_: string[] = []
+
 const title: { val: string, isValid: boolean } = reactive({ val: '', isValid: false })
 const description: Ref<string> = ref('')
-let k: Boards = [];
-const data: Data[] = store.getters.data
-
-console.log(data)
-for (const a of data) {
-    k = [...a.boards]
-}
-
-console.log(props.route)
-const filterData: (route: string | string[]) => void = (route) => {
+const data: ComputedRef<Data[]> = computed(() => store.getters.data)
+const columns: ComputedRef<Columns> = computed(() => {
+    const filtered = data.value[0].boards.filter(({ name }) => name === route.params.children)
     let column: Columns = []
-    let filter = (k.filter(({ name }) => name === route)).filter(({ columns }) => columns);
-    for (const a of filter) {
+    for (const a of filtered) {
         column = a.columns
     }
+    return column
+})
+const select_: ComputedRef<string[]> = computed(() => {
     let s: string[] = [];
-    column.forEach(({ name }) => {
+    columns.value.forEach(({ name }) => {
         s.push(name)
-        select_ = [...s]
-    }
-    )
-}
-watch(() => route.params.children, (newRoute, oldRoute) => {
-    filterData(newRoute)
+
+    })
+    return [...s]
 })
-onMounted(() => {
-    const initialRoute = route.params.children;
-    filterData(initialRoute)
-})
-// const filter = k.filter((k_) => k_.name === props.route)
-// for (const a of filter) {
-//     column = (a.columns)
-// }
-// console.log(column)
-// for (const a of column) {
-//     console.log(a.name)
-//     select_.push(a.name)
-// }
-console.log(select_)
-console.log(select_)
 const subtasks: Ref<{ val: '', isValid: boolean }[]> = ref([{ val: '', isValid: false }, { val: "", isValid: false }]);
 const addSubtasks: () => void = () => {
     subtasks.value.push({ val: '', isValid: false })

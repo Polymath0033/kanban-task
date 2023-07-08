@@ -2,40 +2,11 @@
 import { getImageLink } from '@/lib/getImageLink';
 import ThemeBtn from './UI/ThemeBtn.vue';
 import IconEye from './icons/IconEye.vue';
-import { useStore } from '../store_/index'
-import type { Data } from '@/types/Data';
 import { UseToggle } from '@/composable/use-toggle';
-import AddBoard from './AddBoard.vue';
-import { watch, reactive, onMounted } from 'vue';
-
 import NavList from './UI/NavList.vue';
 const { toggle, toggleHandler } = UseToggle()
 defineProps<{ theme: string }>()
 defineEmits<{ (e: 'toggle-theme'): void, (e: 'toggle-btn'): void }>()
-const store = useStore();
-const data: Data[] = store.state.data;
-type T = Data['boards']
-let routes: T = reactive([]);
-
-watch(() => store, (newRoutes, oldRoutes) => {
-    let arr: T = []
-    for (const a of data) {
-        arr = [...a.boards]
-    }
-    const fil = (arr.filter((g) => g))
-    routes = [...fil];
-}, { deep: true, immediate: true })
-
-onMounted(() => {
-    let arr: T = []
-    for (const a of data) {
-        arr = [...a.boards]
-    }
-
-    const fil = (arr.filter((g) => g))
-    routes = [...fil];
-})
-console.log(routes)
 </script>
 <template>
     <aside>
@@ -43,7 +14,7 @@ console.log(routes)
             <div class="image">
                 <img :src="`${theme === 'light' ? getImageLink('logo-dark') : getImageLink('logo-light')}`" />
             </div>
-            <NavList :toggle="toggle" :routes="routes" @toggle-handler="toggleHandler" />
+            <NavList :toggle="toggle" @toggle-handler="toggleHandler" />
         </span>
         <div class="btn">
             <ThemeBtn @toggle-theme="$emit('toggle-theme')" />
