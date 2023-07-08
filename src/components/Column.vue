@@ -11,11 +11,11 @@ const addColumn = () => {
 </script>
 <template>
     <menu v-for="col in props.columns" :key="col.name">
-        <h6 class="title"> <span></span>{{ col.name }} ({{ col.tasks.length }})</h6>
+        <h2 class="title"> <span></span>{{ col.name }} ({{ col.tasks.length }})</h2>
         <Card v-for="task in col.tasks" :key="task.title" :title="task.title" :subtasks="task.subtasks" :columns="columns"
             :col="col.name" />
     </menu>
-    <aside>
+    <aside role="cell">
         <button @click="addColumn">+ New Column</button>
     </aside>
 </template>
@@ -31,7 +31,7 @@ menu {
     color: var(--gray);
     align-items: center;
     width: 250px;
-    text-transform: capitalize;
+    text-transform: uppercase;
 }
 
 .title span {

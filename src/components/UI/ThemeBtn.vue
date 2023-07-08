@@ -3,12 +3,12 @@ defineEmits<{ (e: 'toggle-theme'): void }>()
 </script>
 <template>
     <div class="button">
-        <img src="../../assets/icon-light-theme.svg" />
+        <img src="../../assets/icon-light-theme.svg" alt="light" />
         <label for="checkbox" class="label">
             <input type="checkbox" name="checkbox" id="checkbox" v-on:change="$emit('toggle-theme')">
             <span class="inner"></span>
         </label>
-        <img src="../../assets/icon-dark-theme.svg" />
+        <img src="../../assets/icon-dark-theme.svg" alt="moon" />
     </div>
 </template>
 <style scoped>
