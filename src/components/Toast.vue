@@ -54,6 +54,7 @@ const deleteHandler: () => void = () => {
 
 </script>
 <template>
+    <div v-if="props.show" @click="$emit('toggle-handler')" class="backdrop"></div>
     <ul v-if="props.show">
         <li v-on:click="openEdit">Edit {{ props.content }} </li>
         <li v-on:click="openDelete">Delete {{ props.content }}</li>

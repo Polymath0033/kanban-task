@@ -26,6 +26,7 @@ const deleteTask = () => {
 }
 </script>
 <template>
+    <div v-if="props.show" @click="$emit('toggle-handler')" class="backdrop"></div>
     <ul v-if="props.show">
         <li v-on:click="openEdit">Edit Task</li>
         <li v-on:click="openDelete">Delete Task</li>

@@ -2,11 +2,15 @@
 import type { Columns } from '@/types/Data';
 import Card from './UI/Card.vue';
 import { useStore } from '../store_/index'
+import { ref, type Ref } from 'vue';
+import Draggable from 'vuedraggable';
 const props = defineProps<{ columns: Columns }>()
 const store = useStore()
 const addColumn = () => {
     store.dispatch('toggleModal')
 }
+//const drag: Ref<boolean> = ref(false)
+// const columns: Ref<Columns> = ref(props.columns)
 // v-if="col.tasks.length > 0"
 </script>
 <template>
@@ -31,7 +35,7 @@ menu {
     color: var(--gray);
     align-items: center;
     width: 250px;
-    font-size:13px;
+    font-size: 10px;
     text-transform: uppercase;
 }
 

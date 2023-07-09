@@ -2,11 +2,14 @@
 import { useRoute } from 'vue-router';
 import { useStore } from '../store_/index';
 import Column from './Column.vue';
+import { type Ref, ref } from 'vue';
 import type { Data, Boards, Columns } from '@/types/Data';
 import { computed, type ComputedRef } from 'vue';
 import Button from '../components/UI/Button.vue'
+
 const router = useRoute();
 const store = useStore();
+const drag: Ref<boolean> = ref(false)
 const space: ComputedRef<boolean> = computed(() => store.getters.toggle)
 const data: ComputedRef<Data[]> = computed(() => store.getters.data);
 const columns: ComputedRef<Columns> = computed(() => {
@@ -40,7 +43,10 @@ const modal: ComputedRef<boolean> = computed(() => store.getters.modal)
     <Button value="+ Add new column" @click-handler="addTask" />
   </section>
   <section v-else :class="!space ? 'left' : ''">
+
     <Column :columns="columns" />
+
+
   </section>
 </template>
 

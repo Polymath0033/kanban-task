@@ -204,6 +204,9 @@ img:disabled,
 
     .button button:last-of-type {
         display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
     }
 
     .logo {

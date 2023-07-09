@@ -42,7 +42,7 @@ defineEmits<{ (e: 'toggle-theme'): void, (e: 'toggle-btn'): void }>()
 aside {
     background-color: var(--secondary-background);
     position: relative;
-    min-height: 100%;
+    min-height: 100vh;
     border-right: 1px solid var(--line);
     width: 250px;
     display: flex;

@@ -43,8 +43,7 @@ const addBoard = () => {
     }
     const payload: Board = { name: title.value, columns: task }
     store.dispatch('addBoard', payload);
-    store.dispatch('toggleBoard')
-    emit('toggle-handler')
+    toggleBoard()
     title.value = '';
     for (let i = 0; i < columns.value.length; i++) {
         columns.value[i].val = '';
